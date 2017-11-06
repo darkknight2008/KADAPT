@@ -48,20 +48,12 @@ public class NewBehaviourTree3 : MonoBehaviour
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
 
-    public virtual RunStatus IsHitGround(GameObject ball)
-    {
-        if (ball.transform.position.z==0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
-        {
-            return RunStatus.Success;
-        }
-        return RunStatus.Running;
-    }
     protected Node hitGround(GameObject ball)
     {
         Func<RunStatus> IsHitGround =
         delegate ()
         {
-            if (ball.transform.position.z == 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+            if (ball.transform.position.y == 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
             {
                 return RunStatus.Success;
             }
