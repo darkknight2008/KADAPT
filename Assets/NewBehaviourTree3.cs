@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -90,8 +91,8 @@ public class NewBehaviourTree3 : MonoBehaviour
                                 new Sequence
                                 (
                                     this.putBall(peopleA, ball, this.thrower),
-                                    new LeafWait(1000),
-                                    this.throwBall(ball)
+                                    new LeafWait(1000)
+                                    //this.throwBall(ball)
                                  )
                              ),
                             this.hitGround(ball),
@@ -114,8 +115,8 @@ public class NewBehaviourTree3 : MonoBehaviour
                                         this.move(peopleB, this.meetpoint),
                                         new SequenceParallel
                                         (
-                                            this.sayHi(peopleB, peopleC),
-                                            this.sayHi(peopleC, peopleB)
+                                            //this.sayHi(peopleB, peopleC),
+                                            //this.sayHi(peopleC, peopleB)
                                         )
                                     )
                                )
@@ -123,7 +124,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                             new Sequence
                             (
                                 this.moveToBall(peopleB, ball),
-                                this.squat(peopleB),
+                                //this.squat(peopleB),
                                 this.catchBall(peopleB, ball),
                                 this.move(peopleB, tablepoint),
                                 this.putBall(peopleB, ball, this.table),
@@ -133,4 +134,146 @@ public class NewBehaviourTree3 : MonoBehaviour
                     );
         return roaming;
     }
+
+    protected Node catchBall(GameObject people, GameObject ball)
+    {
+        return new Grab(people, ball, 2000);
+    }
+    public class Grab : Node
+    {
+        protected Stopwatch stopwatch;
+        protected long actionTime;
+        protected GameObject participant;
+        protected GameObject ball;
+        protected GameObject Dummy;
+
+        public Grab(GameObject participant, GameObject ball, Val<long> actionTime)
+        {
+            this.participant = participant;
+            this.actionTime = actionTime.Value;
+            this.stopwatch = new Stopwatch();
+            this.ball = ball;
+            this.Dummy = new GameObject();
+            this.Dummy.transform.position = ball.transform.position;
+            this.Dummy.transform.rotation = ball.transform.rotation;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            this.stopwatch.Reset();
+            this.stopwatch.Start();
+        }
+
+        public override void Stop()
+        {
+            base.Stop();
+            this.stopwatch.Stop();
+        }
+
+        public override sealed IEnumerable<RunStatus> Execute()
+        {
+            while (true)
+            {
+                // Count down the wait timer
+                // If we've waited long enough, succeed
+                if (this.stopwatch.ElapsedMilliseconds >= 2 * this.actionTime)
+                {
+                    participant.GetComponent<IKtest>().time = 0.0f;
+                    participant.GetComponent<BodyMecanim>().BodyAnimation("PICKUPRIGHT", false);
+                    yield return RunStatus.Success;
+                    yield break;
+                }
+                //if (ball.transform.position.y < 0.2)
+                //{
+                //    participant.GetComponent<BodyMecanim>().BodyAnimation("PICKUPRIGHT", true);
+                //}
+                else if (this.stopwatch.ElapsedMilliseconds <= this.actionTime)
+                {
+                    participant.GetComponent<IKtest>().rightHandObj = ball.transform;
+                    participant.GetComponent<IKtest>().lookObj = ball.transform;
+                    participant.GetComponent<IKtest>().time = (float)this.stopwatch.ElapsedMilliseconds / (float)this.actionTime;
+                }
+                else
+                {
+                    ball.GetComponent<BallController>().isHold = true;
+                    ball.GetComponent<BallController>().holdBy = participant;
+
+                    participant.GetComponent<IKtest>().rightHandObj = Dummy.transform;
+                    participant.GetComponent<IKtest>().lookObj = null;
+                    participant.GetComponent<IKtest>().time = (float)(2 * this.actionTime - this.stopwatch.ElapsedMilliseconds) / (float)this.actionTime;
+                    //participant.GetComponent<IKtest>().time = 0.0f;
+                }
+                yield return RunStatus.Running;
+            }
+        }
+    }
+
+    protected Node putBall(GameObject people, GameObject ball, Transform target)
+    {
+        return new Put(people, ball, target, 2000);
+    }
+    public class Put : Node
+    {
+        protected Stopwatch stopwatch;
+        protected long actionTime;
+        protected GameObject participant;
+        protected GameObject ball;
+        protected Transform targetLocation;
+
+        public Put(GameObject participant, GameObject ball, Transform targetLocation, Val<long> actionTime)
+        {
+            this.participant = participant;
+            this.ball = ball;
+            this.actionTime = actionTime.Value;
+            this.stopwatch = new Stopwatch();
+            this.targetLocation = targetLocation;
+        }
+
+        public override void Start()
+        {
+            base.Start();
+            this.stopwatch.Reset();
+            this.stopwatch.Start();
+        }
+
+        public override void Stop()
+        {
+            base.Stop();
+            this.stopwatch.Stop();
+        }
+
+        public override sealed IEnumerable<RunStatus> Execute()
+        {
+            while (true)
+            {
+                // Count down the wait timer
+                // If we've waited long enough, succeed
+                if (this.stopwatch.ElapsedMilliseconds >= 2 * this.actionTime)
+                {
+                    participant.GetComponent<IKtest>().time = 0.0f;
+                    yield return RunStatus.Success;
+                    yield break;
+                }
+                else if (this.stopwatch.ElapsedMilliseconds <= this.actionTime)
+                {
+                    participant.GetComponent<IKtest>().rightHandObj = this.targetLocation;
+                    participant.GetComponent<IKtest>().lookObj = this.targetLocation;
+                    participant.GetComponent<IKtest>().time = (float)this.stopwatch.ElapsedMilliseconds / (float)this.actionTime;
+                }
+                else
+                {
+                    ball.GetComponent<BallController>().isHold = false;
+
+                    participant.GetComponent<IKtest>().rightHandObj = this.targetLocation;
+                    participant.GetComponent<IKtest>().lookObj = null;
+                    participant.GetComponent<IKtest>().time = (float)(2 * this.actionTime - this.stopwatch.ElapsedMilliseconds) / (float)this.actionTime;
+                }
+                yield return RunStatus.Running;
+            }
+        }
+    }
+
+
+
 }
