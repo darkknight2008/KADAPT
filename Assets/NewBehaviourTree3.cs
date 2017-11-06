@@ -44,7 +44,7 @@ public class NewBehaviourTree3 : MonoBehaviour {
                                 this.move(peopleA, this.tablepoint),
                                 this.catchBall(peopleA, ball),
                                 this.move(peopleA, this.A0),
-                                new SequenceShuffle
+                                new Sequence
                                 (
                                     this.putBall(peopleA, ball, this.thrower),
                                     new LeafWait(1000),
@@ -52,21 +52,21 @@ public class NewBehaviourTree3 : MonoBehaviour {
                                  )
                              ),
                             this.hitGround(ball),
-                            new SelectorShuffle
+                            new Selector
                             (
                                 this.outOfYard(ball),
                                 new SelectorParallel
                                 (
                                     new DecoratorLoop
                                     (
-                                        new SequenceShuffle
+                                        new Sequenceshuffle
                                         (
                                              this.move(peopleA, this.wander1),
                                              this.move(peopleA, this.wander2),
                                              this.move(peopleA, this.wander3)
                                         )
                                     ),
-                                    new SequenceShuffle
+                                    new Sequence
                                     (
                                         this.move(peopleB, this.meetpoint),
                                         new SequenceParallel
@@ -77,7 +77,7 @@ public class NewBehaviourTree3 : MonoBehaviour {
                                     )
                                )
                             ),
-                            new SequenceShuffle
+                            new Sequence
                             (
                                 this.moveToBall(peopleB, ball),
                                 this.squat(peopleB),
