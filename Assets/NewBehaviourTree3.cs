@@ -23,6 +23,8 @@ public class NewBehaviourTree3 : MonoBehaviour
     public GameObject peopleC;
     private BehaviorAgent behaviorAgent;
 
+    public bool run;
+
     // Use this for initialization
     void Start()
     {
@@ -77,62 +79,113 @@ public class NewBehaviourTree3 : MonoBehaviour
         return new LeafInvoke(IsoutOfYard);
     }
 
+    //private RunStatus Hold()
+    //{
+    //    if (ball.transform.position.y < 0.2)
+    //    {
+    //        //if (!peopleA.gameObject.GetComponent<Animator>().GetBool("B_PickupRight"))
+    //        //{
+    //        //    peopleA.gameObject.GetComponent<Animator>().SetTrigger("B_PickupRight");
+    //        //}
+    //        return RunStatus.Running;
+    //    }
+    //    peopleA.gameObject.GetComponent<Animator>().SetTrigger("B_PickupRight");
+    //    return RunStatus.Success;
+    //}
+
+    protected bool StartSquat(GameObject people)
+    {
+        people.GetComponent<Animator>().SetBool("squat_down", true);
+        return true;
+    }
+
+    protected Node squat(GameObject people)
+    {
+        return new SequenceParallel(
+            new LeafAssert(() => StartSquat(people)),
+            new LeafWait(542)
+        );
+    }
+
+    protected bool StartStand(GameObject people)
+    {
+        people.GetComponent<Animator>().SetBool("squat_down", false);
+        return true;
+    }
+
+    protected Node stand(GameObject people)
+    {
+        return new SequenceParallel(
+            new LeafAssert(() => StartStand(people)),
+            new LeafWait(1292)
+        );
+    }
+
     protected Node BuildTreeRoot()
     {
-        Node roaming = new DecoratorLoop
-                        (
-                        new Sequence
-                        (
-                            new Sequence
-                            (
-                                this.move(peopleA, this.tablepoint),
-                                this.catchBall(peopleA, ball),
-                                this.move(peopleA, this.A0),
-                                new Sequence
-                                (
-                                    this.putBall(peopleA, ball, this.thrower),
-                                    new LeafWait(1000)
-                                    //this.throwBall(ball)
-                                 )
-                             ),
-                            this.hitGround(ball),
-                            new Selector
-                            (
-                                this.outOfYard(ball),
-                                new SelectorParallel
-                                (
-                                    new DecoratorLoop
-                                    (
-                                        new SequenceShuffle
-                                        (
-                                             this.move(peopleA, this.wander1),
-                                             this.move(peopleA, this.wander2),
-                                             this.move(peopleA, this.wander3)
-                                        )
-                                    ),
-                                    new Sequence
-                                    (
-                                        this.move(peopleB, this.meetpoint),
-                                        new SequenceParallel
-                                        (
-                                            //this.sayHi(peopleB, peopleC),
-                                            //this.sayHi(peopleC, peopleB)
-                                        )
-                                    )
-                               )
-                            ),
-                            new Sequence
-                            (
-                                this.moveToBall(peopleB, ball),
-                                //this.squat(peopleB),
-                                this.catchBall(peopleB, ball),
-                                this.move(peopleB, tablepoint),
-                                this.putBall(peopleB, ball, this.table),
-                                this.move(peopleB, this.B0)
-                            )
-                        )
-                    );
+        Node roaming = new DecoratorLoop(
+            new Sequence(
+                this.squat(peopleA),
+                this.catchBall(peopleA, ball),
+                this.stand(peopleA),
+                new LeafWait(10000000000)
+                )
+            );
         return roaming;
+        //Node roaming = new DecoratorLoop
+        //                (
+        //                new Sequence
+        //                (
+        //                    new Sequence
+        //                    (
+        //                        this.move(peopleA, this.tablepoint),
+        //                        this.catchBall(peopleA, ball),
+        //                        this.move(peopleA, this.A0),
+        //                        new Sequence
+        //                        (
+        //                            this.putBall(peopleA, ball, this.thrower),
+        //                            new LeafWait(1000)
+        //                            //this.throwBall(ball)
+        //                         )
+        //                     ),
+        //                    this.hitGround(ball),
+        //                    new Selector
+        //                    (
+        //                        this.outOfYard(ball),
+        //                        new SelectorParallel
+        //                        (
+        //                            new DecoratorLoop
+        //                            (
+        //                                new SequenceShuffle
+        //                                (
+        //                                     this.move(peopleA, this.wander1),
+        //                                     this.move(peopleA, this.wander2),
+        //                                     this.move(peopleA, this.wander3)
+        //                                )
+        //                            ),
+        //                            new Sequence
+        //                            (
+        //                                this.move(peopleB, this.meetpoint),
+        //                                new SequenceParallel
+        //                                (
+        //                                    //this.sayHi(peopleB, peopleC),
+        //                                    //this.sayHi(peopleC, peopleB)
+        //                                )
+        //                            )
+        //                       )
+        //                    ),
+        //                    new Sequence
+        //                    (
+        //                        this.moveToBall(peopleB, ball),
+        //                        //this.squat(peopleB),
+        //                        this.catchBall(peopleB, ball),
+        //                        this.move(peopleB, tablepoint),
+        //                        this.putBall(peopleB, ball, this.table),
+        //                        this.move(peopleB, this.B0)
+        //                    )
+        //                )
+        //            );
+        //return roaming;
     }
 
     protected Node catchBall(GameObject people, GameObject ball)
@@ -175,6 +228,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         {
             while (true)
             {
+                ball.GetComponent<BallController>().holdBy = participant;
                 // Count down the wait timer
                 // If we've waited long enough, succeed
                 if (this.stopwatch.ElapsedMilliseconds >= 2 * this.actionTime)
@@ -197,7 +251,6 @@ public class NewBehaviourTree3 : MonoBehaviour
                 else
                 {
                     ball.GetComponent<BallController>().isHold = true;
-                    ball.GetComponent<BallController>().holdBy = participant;
 
                     participant.GetComponent<IKtest>().rightHandObj = Dummy.transform;
                     participant.GetComponent<IKtest>().lookObj = null;

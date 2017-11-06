@@ -41,9 +41,9 @@ public class IKtest : MonoBehaviour
                 if (rightHandObj != null)
                 {
                     animator.SetIKPositionWeight(AvatarIKGoal.RightHand, time);
-                    animator.SetIKRotationWeight(AvatarIKGoal.RightHand, time);
+                    //animator.SetIKRotationWeight(AvatarIKGoal.RightHand, time);
                     animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandObj.position);
-                    animator.SetIKRotation(AvatarIKGoal.RightHand, rightHandObj.rotation);
+                    //animator.SetIKRotation(AvatarIKGoal.RightHand, rightHandObj.rotation);
                 }
 
             }

@@ -26,9 +26,9 @@ public class BallController : MonoBehaviour
             transform.position = difference + holdBy.transform.Find("Daniel/UMA_Male_Rig/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand").transform.position;
             transform.rotation = holdBy.transform.Find("Daniel/UMA_Male_Rig/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand").transform.rotation;
         }
-        //else if (holdBy)
-        //{
-        //    difference = transform.position - holdBy.transform.Find("Daniel/UMA_Male_Rig/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand").transform.position;
-        //}
+        else if (holdBy)
+        {
+            difference = transform.position - holdBy.transform.Find("Daniel/UMA_Male_Rig/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand").transform.position;
+        }
     }
 }
