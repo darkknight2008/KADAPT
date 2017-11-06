@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -46,6 +46,42 @@ public class NewBehaviourTree3 : MonoBehaviour
     {
         Val<Vector3> position = Val.V(() => ball.transform.position);
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
+    }
+
+    public virtual RunStatus IsHitGround(GameObject ball)
+    {
+        if (ball.transform.position.z==0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+        {
+            return RunStatus.Success;
+        }
+        return RunStatus.Running;
+    }
+    protected Node hitGround(GameObject ball)
+    {
+        Func<RunStatus> IsHitGround =
+        delegate ()
+        {
+            if (ball.transform.position.z == 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+            {
+                return RunStatus.Success;
+            }
+            return RunStatus.Running;
+        };
+        return new LeafInvoke(IsHitGround);
+    }
+
+    protected Node outOfYard(GameObject ball)
+    {
+        Func<RunStatus> IsoutOfYard =
+        delegate ()
+        {
+            if (ball.transform.position.x <18.937)
+            {
+                return RunStatus.Success;
+            }
+            return RunStatus.Running;
+        };
+        return new LeafInvoke(IsoutOfYard);
     }
 
     protected Node BuildTreeRoot()
