@@ -71,8 +71,8 @@ public class NewBehaviourTree3 : MonoBehaviour {
                                         this.move(peopleB, this.meetpoint),
                                         new SequenceParallel
                                         (
-                                            this.sayHi(peopleB),
-                                            this.sayHi(peopleC)
+                                            this.sayHi(peopleB,peopleC),
+                                            this.sayHi(peopleC,peopleB)
                                         )
                                     )
                                )
