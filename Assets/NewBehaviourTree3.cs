@@ -124,11 +124,12 @@ public class NewBehaviourTree3 : MonoBehaviour
     protected Node BuildTreeRoot()
     {
         Node roaming = new DecoratorLoop(
-            new Sequence(
-                this.squat(peopleA),
-                this.catchBall(peopleA, ball),
-                this.stand(peopleA),
-                new LeafWait(10000000000)
+            new FlipFlop(
+                new Sequence(
+                    this.squat(peopleA),
+                    this.catchBall(peopleA, ball),
+                    this.stand(peopleA)),
+                new LeafWait(3000)
                 )
             );
         return roaming;
@@ -190,7 +191,7 @@ public class NewBehaviourTree3 : MonoBehaviour
 
     protected Node catchBall(GameObject people, GameObject ball)
     {
-        return new Grab(people, ball, 2000);
+        return new Grab(people, ball, 1000);
     }
     public class Grab : Node
     {
@@ -264,7 +265,7 @@ public class NewBehaviourTree3 : MonoBehaviour
 
     protected Node putBall(GameObject people, GameObject ball, Transform target)
     {
-        return new Put(people, ball, target, 2000);
+        return new Put(people, ball, target, 1000);
     }
     public class Put : Node
     {

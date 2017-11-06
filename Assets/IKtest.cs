@@ -33,7 +33,7 @@ public class IKtest : MonoBehaviour
                 // Set the look target position, if one has been assigned
                 if (lookObj != null)
                 {
-                    animator.SetLookAtWeight(1);
+                    animator.SetLookAtWeight(time);
                     animator.SetLookAtPosition(lookObj.position);
                 }
 
