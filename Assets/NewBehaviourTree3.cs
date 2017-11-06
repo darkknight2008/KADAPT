@@ -33,6 +33,19 @@ public class NewBehaviourTree3 : MonoBehaviour {
     {
 
     }
+    
+    protected Node move( GameObject people, Transform target)
+    {
+        Val<Vector3> position = Val.V(() => target.position);
+        return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
+    }
+
+    protected Node moveToBall(GameObject people, GameObject ball)
+    {
+        Val<Vector3> position = Val.V(() => ball.transform.position);
+        return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
+    }
+    
         protected Node BuildTreeRoot()
     {
         Node roaming = new DecoratorLoop
@@ -59,7 +72,7 @@ public class NewBehaviourTree3 : MonoBehaviour {
                                 (
                                     new DecoratorLoop
                                     (
-                                        new Sequenceshuffle
+                                        new SequenceShuffle
                                         (
                                              this.move(peopleA, this.wander1),
                                              this.move(peopleA, this.wander2),
