@@ -37,9 +37,9 @@ public class NewBehaviourTree3 : MonoBehaviour {
     {
         Node roaming = new DecoratorLoop
                         (
-                        new SequenceShuffle
+                        new Sequence
                         (
-                            new SequenceShuffle
+                            new Sequence
                             (
                                 this.move(peopleA, this.tablepoint),
                                 this.catchBall(peopleA, ball),
