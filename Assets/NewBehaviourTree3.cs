@@ -36,10 +36,13 @@ public class NewBehaviourTree3 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKey(KeyCode.Space))
+        {
+            ball.transform.position = new Vector3(-1f, 0, -1f);
+        }
     }
 
-    protected Node move( GameObject people, Transform target)
+    protected Node move(GameObject people, Transform target)
     {
         Val<Vector3> position = Val.V(() => target.position);
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
@@ -51,32 +54,55 @@ public class NewBehaviourTree3 : MonoBehaviour
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
 
-    protected Node hitGround(GameObject ball)
+    protected Node throwBall(GameObject ball)
     {
-        Func<RunStatus> IsHitGround =
-        delegate ()
-        {
-            if (ball.transform.position.y == 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
-            {
-                return RunStatus.Success;
-            }
-            return RunStatus.Running;
-        };
-        return new LeafInvoke(IsHitGround);
+        return new LeafAssert(() => this.throw_ball(ball));
+    }
+    public bool throw_ball(GameObject  ball)
+    {
+        Vector3 w = new Vector3(-500 * Time.deltaTime, 0, 0);
+        ball.GetComponent<Rigidbody>().AddForce(w * 50);
+        return true;
     }
 
+    public class isHitGround : Node
+{
+	protected GameObject ball;
+	public isHitGround(GameObject ball)
+	{
+		this.ball=ball;
+	}
+	public override IEnumerable<RunStatus> Execute()
+	{
+		if (ball.transform.position.y < 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+			yield return RunStatus.Success;
+		else
+			yield return RunStatus.Running;
+	}
+}
+    protected Node hitGround(GameObject ball)
+    {
+        return new isHitGround(ball);
+    }
+
+    public class isOutOfYard : Node
+{
+	protected GameObject ball;
+	public isOutOfYard(GameObject ball)
+	{
+		this.ball=ball;
+	}
+	public override IEnumerable<RunStatus> Execute()
+	{
+		if (ball.transform.position.x < 18.937)
+			yield return RunStatus.Success;
+		else
+			yield return RunStatus.Failure;
+	}
+}
     protected Node outOfYard(GameObject ball)
     {
-        Func<RunStatus> IsoutOfYard =
-        delegate ()
-        {
-            if (ball.transform.position.x <18.937)
-            {
-                return RunStatus.Success;
-            }
-            return RunStatus.Running;
-        };
-        return new LeafInvoke(IsoutOfYard);
+        return new isOutOfYard(ball);
     }
 
     //private RunStatus Hold()
@@ -123,70 +149,61 @@ public class NewBehaviourTree3 : MonoBehaviour
 
     protected Node BuildTreeRoot()
     {
-        Node roaming = new DecoratorLoop(
-            new FlipFlop(
-                new Sequence(
-                    this.squat(peopleA),
-                    this.catchBall(peopleA, ball),
-                    this.stand(peopleA)),
-                new LeafWait(3000)
-                )
-            );
+        Node roaming = new DecoratorLoop
+                        (
+                        new Sequence
+                        (
+                            new Sequence
+                            (
+                                this.move(peopleA, this.tablepoint),
+                                this.catchBall(peopleA, ball),
+                                this.move(peopleA, this.A0),
+                                new Sequence
+                                (
+                                    this.putBall(peopleA, ball, this.thrower),
+                                    new LeafWait(1000),
+                                    this.throwBall(ball)
+                                 )
+                             ),
+                            this.hitGround(ball),
+                            new Selector
+                            (
+                                this.outOfYard(ball),
+                                new SelectorParallel
+                                (
+                                    new DecoratorLoop
+                                    (
+                                        new SequenceShuffle
+                                        (
+                                             this.move(peopleA, this.wander1),
+                                             this.move(peopleA, this.wander2),
+                                             this.move(peopleA, this.wander3)
+                                        )
+                                    ),
+                                    new Sequence
+                                    (
+                                        this.move(peopleB, this.meetpoint),
+                                        new SequenceParallel
+                                        (
+                                        //this.sayHi(peopleB, peopleC),
+                                        //this.sayHi(peopleC, peopleB)
+                                        )
+                                    )
+                               )
+                            ),
+                            new Sequence
+                            (
+                                this.moveToBall(peopleB, ball),
+                                this.squat(peopleB), this.catchBall(peopleB, ball),
+                                this.catchBall(peopleB, ball),
+                                 this.stand(peopleB),
+                                this.move(peopleB, tablepoint),
+                                this.putBall(peopleB, ball, this.table),
+                                this.move(peopleB, this.B0)
+                            )
+                        )
+                    );
         return roaming;
-        //Node roaming = new DecoratorLoop
-        //                (
-        //                new Sequence
-        //                (
-        //                    new Sequence
-        //                    (
-        //                        this.move(peopleA, this.tablepoint),
-        //                        this.catchBall(peopleA, ball),
-        //                        this.move(peopleA, this.A0),
-        //                        new Sequence
-        //                        (
-        //                            this.putBall(peopleA, ball, this.thrower),
-        //                            new LeafWait(1000)
-        //                            //this.throwBall(ball)
-        //                         )
-        //                     ),
-        //                    this.hitGround(ball),
-        //                    new Selector
-        //                    (
-        //                        this.outOfYard(ball),
-        //                        new SelectorParallel
-        //                        (
-        //                            new DecoratorLoop
-        //                            (
-        //                                new SequenceShuffle
-        //                                (
-        //                                     this.move(peopleA, this.wander1),
-        //                                     this.move(peopleA, this.wander2),
-        //                                     this.move(peopleA, this.wander3)
-        //                                )
-        //                            ),
-        //                            new Sequence
-        //                            (
-        //                                this.move(peopleB, this.meetpoint),
-        //                                new SequenceParallel
-        //                                (
-        //                                    //this.sayHi(peopleB, peopleC),
-        //                                    //this.sayHi(peopleC, peopleB)
-        //                                )
-        //                            )
-        //                       )
-        //                    ),
-        //                    new Sequence
-        //                    (
-        //                        this.moveToBall(peopleB, ball),
-        //                        //this.squat(peopleB),
-        //                        this.catchBall(peopleB, ball),
-        //                        this.move(peopleB, tablepoint),
-        //                        this.putBall(peopleB, ball, this.table),
-        //                        this.move(peopleB, this.B0)
-        //                    )
-        //                )
-        //            );
-        //return roaming;
     }
 
     protected Node catchBall(GameObject people, GameObject ball)
