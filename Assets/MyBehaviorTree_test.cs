@@ -9,6 +9,11 @@ public class MyBehaviorTree_test : MonoBehaviour
     public GameObject ChrA, ChrB, ChrC;
     public bool stWave1;
     public bool stWave2;
+    public Transform wander1;
+    public Transform wander2;
+    public Transform meetC;
+    public Transform fetchBall;
+   
 
     private BehaviorAgent behaviorAgent;
     // Use this for initialization
@@ -28,9 +33,43 @@ public class MyBehaviorTree_test : MonoBehaviour
  
     protected Node BuildTreeRoot()
     {
-        Node roaming = new DecoratorLoop(new Sequence(this.sayHi(ChrB,ChrC),new LeafWait(100)));
-        //return this.sayHi(ChrB, ChrC);
+        Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
         return roaming;
+    }
+    protected Node wander(GameObject ppl0, Transform wander1, Transform wander2)
+    {
+        Animator animator0 = ppl0.GetComponent<Animator>();
+        return new Sequence(ST_ApproachAndWait(ppl0, wander1),new LeafAssert(()=> this.feelSad(animator0)), ST_ApproachAndWait(ppl0, wander2),new LeafAssert(()=> this.crying(animator0)));
+    }
+    protected Node ST_ApproachAndWait(GameObject ppl,Transform target)
+    {
+        Val<Vector3> position = Val.V(() => target.position);
+        return new Sequence(ppl.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(100));
+    }
+    public bool feelSad(Animator animator)
+    {
+        AnimatorStateInfo state= animator.GetCurrentAnimatorStateInfo(0);
+        bool isSad = state.IsName("IdleSad");
+        animator.SetTrigger("FeelSad");
+        /*if (isSad)
+        {
+            animator.SetTrigger("Idle");
+        }*/
+        animator.SetTrigger("Idle");
+        return true;
+    }
+    public bool crying(Animator animator)
+    {
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        bool isCry = state.IsName("Cry");
+        animator.SetTrigger("H_Cry");
+        animator.SetTrigger("Idle");
+        return true;
+    }
+    protected Node move(GameObject people, Transform target)
+    {
+        Val<Vector3> position = Val.V(() => target.position);
+        return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
     protected Node sayHi(GameObject ppl1, GameObject ppl2)
     {
@@ -40,13 +79,11 @@ public class MyBehaviorTree_test : MonoBehaviour
     }
     protected Node Greeting(Animator animator1, Animator animator2)
     {
-        //return new SelectorParallel(new LeafInvoke(() => this.Greet(animator1, animator2)),new LeafWait(100));
-        return new Sequence(new LeafAssert(() => this.Greet(animator1,1)),new LeafWait(1000), new LeafAssert(() => this.Greet(animator2,2)));
-        //return new LeafAssert(() => this.Greet(animator1,animator2));
+        return new Sequence(new LeafAssert(() => this.Greet(animator1,1)),new LeafWait(1000), new LeafAssert(() => this.Greet(animator2,2)),new LeafWait(2000));
     }
     protected Node Talking(Animator animator1)
     {
-        return new SelectorParallel(new LeafAssert(() => this.pointing(animator1)), new LeafWait(1000));
+        return new SelectorParallel(new LeafAssert(() => this.pointing(animator1)), new LeafWait(800));
         //new LeafInvoke(() => this.pointing(animator1))
     }
     protected Node response(Animator animator2)
@@ -58,19 +95,19 @@ public class MyBehaviorTree_test : MonoBehaviour
         AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);;
         if (index == 1)
         {
-            if (stWave1)
-            {
+           // if (stWave1)
+           // {
                 m_Animator.SetTrigger("H_Wave");
                 stWave1 = false;
-            }
+           // }
         }
         else
         {
-            if (stWave2)
-            {
+           // if (stWave2)
+           // {
                 m_Animator.SetTrigger("H_Wave");
                 stWave2 = false;
-            }
+           // }
         }
         return true;
     }
@@ -80,18 +117,22 @@ public class MyBehaviorTree_test : MonoBehaviour
         bool isPoint = state1.IsName("LookUp");
 
         m_Animator1.SetTrigger("H_LookUp");
-        if (isPoint)
-        {
+        //if (isPoint)
+        //{
             m_Animator1.SetTrigger("Idle");
-        }
+        //}
         return true;
     
     }
     public bool responsing(Animator animator)
     {
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        bool isSurprise = state.IsName("Surprised");
+        bool isThink = state.IsName("Think");
         animator.SetTrigger("H_Think");
+       if (isThink)
+        {
+            animator.SetTrigger("Idle");
+        }
         return true;
     }
 }
