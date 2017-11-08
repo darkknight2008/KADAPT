@@ -178,7 +178,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                             new Selector
                             (
                                 this.outOfYard(ball),
-                                new SelectorParallel
+                                new SequenceParallel
                                 (
                                     new DecoratorLoop
                                     (
