@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\BallController.cs" />
+    <Compile Include="Assets\ballpoint.cs" />
     <Compile Include="Assets\Core\Libraries\RootMotion\FinalIK\_DEMOS\Aim IK\Scripts\AimBoxing.cs" />
     <Compile Include="Assets\Core\Libraries\RootMotion\FinalIK\_DEMOS\Aim IK\Scripts\CharacterControllerSimpleAim.cs" />
     <Compile Include="Assets\Core\Libraries\RootMotion\FinalIK\_DEMOS\Aim IK\Scripts\SimpleAimingSystem.cs" />
@@ -253,6 +254,7 @@
     <Compile Include="Assets\MyBehaviorTree_test.cs" />
     <Compile Include="Assets\MyBehaviorTree2.cs" />
     <Compile Include="Assets\NewBehaviourTree3.cs" />
+    <Compile Include="Assets\walls_input.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

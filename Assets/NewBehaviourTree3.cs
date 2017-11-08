@@ -14,7 +14,7 @@ public class NewBehaviourTree3 : MonoBehaviour
     public Transform table;
     public Transform wander1;
     public Transform wander2;
-    public Vector3 position1;
+    public Transform ballpoint;
     public bool stWave1;
     public bool stWave2;
     public Transform thrower;
@@ -37,22 +37,12 @@ public class NewBehaviourTree3 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            ball.transform.position = new Vector3(-1f, 0, -1f);
-        }
+
     }
 
     protected Node move(GameObject people, Transform target)
     {
         Val<Vector3> position = Val.V(() => target.position);
-        return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
-    }
-
-    protected Node moveToBall(GameObject people, GameObject ball)
-    {
-        position1 = new Vector3(ball.transform.position.x - 1f, 0, ball.transform.position.z);
-        Val<Vector3> position = Val.V(() => position1);
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
 
@@ -78,7 +68,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         {
             while (true)
             {
-                if (ball.transform.position.y < 0.2 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+                if (ball.transform.position.y < 0.2 && ball.GetComponent<Rigidbody>().velocity.magnitude < 0.5)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -102,7 +92,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            if (ball.transform.position.x < 5)
+            if (ball.transform.position.x >-5)
                 yield return RunStatus.Success;
             else
                 yield return RunStatus.Failure;
@@ -160,7 +150,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                         (
                         new Sequence
                         (
-                            new Sequence
+                             new Sequence
                             (
                                 this.move(peopleA, this.tablepoint),
                                 this.catchBall(peopleA, ball),
@@ -176,6 +166,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                             new Selector
                             (
                                 this.outOfYard(ball),
+                                new Selector(
                                 new SequenceParallel
                                 (
                                     new Sequence
@@ -188,11 +179,13 @@ public class NewBehaviourTree3 : MonoBehaviour
                                         this.move(peopleB, meetpoint),
                                         this.sayHi(peopleB, peopleC)
                                     )
-                                 )
+                                 ),
+                                new LeafWait (100000)
+                                )
                             ),
                             new Sequence
                             (
-                                this.moveToBall(peopleB, ball),
+                                this.move(peopleB, ballpoint),
                                 this.squat(peopleB), this.catchBall(peopleB, ball),
                                 this.catchBall(peopleB, ball),
                                  this.stand(peopleB),
