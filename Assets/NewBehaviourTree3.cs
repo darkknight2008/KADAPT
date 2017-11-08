@@ -66,20 +66,20 @@ public class NewBehaviourTree3 : MonoBehaviour
     }
 
     public class isHitGround : Node
-{
-	protected GameObject ball;
-	public isHitGround(GameObject ball)
-	{
-		this.ball=ball;
-	}
-	public override IEnumerable<RunStatus> Execute()
-	{
-		if (ball.transform.position.y < 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
-			yield return RunStatus.Success;
-		else
-			yield return RunStatus.Running;
-	}
-}
+    {
+        protected GameObject ball;
+        public isHitGround(GameObject ball)
+        {
+            this.ball = ball;
+        }
+        public override IEnumerable<RunStatus> Execute()
+        {
+            if (ball.transform.position.y < 0.6 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+                yield return RunStatus.Success;
+            else
+                yield return RunStatus.Failure ;
+        }
+    }
     protected Node hitGround(GameObject ball)
     {
         return new isHitGround(ball);
