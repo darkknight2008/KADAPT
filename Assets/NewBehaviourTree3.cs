@@ -191,8 +191,8 @@ public class NewBehaviourTree3 : MonoBehaviour
                                     ),
                                     new Sequence
                                     (
-                                        this.move(peopleB, this.meetpoint),
-                                        this.sayHi(peopleB,peopleC)
+                                        this.move(peopleB, this.meetpoint)
+                                        //this.sayHi(peopleB,peopleC)
                                     )
                                )
                             ),
