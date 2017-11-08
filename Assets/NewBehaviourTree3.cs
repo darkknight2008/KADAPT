@@ -85,21 +85,21 @@ public class NewBehaviourTree3 : MonoBehaviour
         return new isHitGround(ball);
     }
 
-    public class isOutOfYard : Node
-{
-	protected GameObject ball;
-	public isOutOfYard(GameObject ball)
-	{
-		this.ball=ball;
-	}
-	public override IEnumerable<RunStatus> Execute()
-	{
-		if (ball.transform.position.x < 18.937)
-			yield return RunStatus.Success;
-		else
-			yield return RunStatus.Failure;
-	}
-}
+   public class isOutOfYard : Node
+    {
+        protected GameObject ball;
+        public isOutOfYard(GameObject ball)
+        {
+            this.ball = ball;
+        }
+        public override IEnumerable<RunStatus> Execute()
+        {
+            if (ball.transform.position.x < 18.937)
+                yield return RunStatus.Success;
+            else
+                yield return RunStatus.Failure;
+        }
+    }
     protected Node outOfYard(GameObject ball)
     {
         return new isOutOfYard(ball);
