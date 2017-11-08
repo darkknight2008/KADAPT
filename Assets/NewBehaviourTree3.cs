@@ -11,7 +11,6 @@ public class NewBehaviourTree3 : MonoBehaviour
     public Transform tablepoint;
     public Transform B0;
     public Transform meetpoint;
-    public Transform table;
     public Transform wander1;
     public Transform wander2;
     public Transform ballpoint;
@@ -100,11 +99,18 @@ public class NewBehaviourTree3 : MonoBehaviour
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            //Debug.Log(ball.transform.position.x.ToString());
-            if (ball.transform.position.x >-5)
-                yield return RunStatus.Success;
-            else
-                yield return RunStatus.Failure;
+            while (true)
+            {
+                //Debug.Log(ball.transform.position.x.ToString());
+                if (ball.transform.position.x > -5)
+                {
+                    yield return RunStatus.Success;
+                    yield break;
+                }
+
+                else
+                    yield return RunStatus.Failure;
+            }
         }
     }
     protected Node outOfYard(GameObject ball)
@@ -182,12 +188,15 @@ public class NewBehaviourTree3 : MonoBehaviour
                                     this.wander(peopleA, wander1, wander2),
                                     new LeafWait(6000)
                                  ),
-                                new Sequence
+                                 new Sequence
                                 (
                                     this.move(peopleB, meetpoint),
+                                    new LeafWait(1000),
                                     this.sayHi(peopleB, peopleC)
                                 )
                             )
+
+
                          ),
 
                         new Sequence
