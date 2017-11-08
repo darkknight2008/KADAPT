@@ -166,7 +166,6 @@ public class NewBehaviourTree3 : MonoBehaviour
                             new Selector
                             (
                                 this.outOfYard(ball),
-                                new Selector(
                                 new SequenceParallel
                                 (
                                     new Sequence
@@ -179,9 +178,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                                         this.move(peopleB, meetpoint),
                                         this.sayHi(peopleB, peopleC)
                                     )
-                                 ),
-                                new LeafWait (100000)
-                                )
+                                 )
                             ),
                             new Sequence
                             (
