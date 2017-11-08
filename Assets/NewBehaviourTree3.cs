@@ -100,6 +100,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         }
         public override IEnumerable<RunStatus> Execute()
         {
+            //Debug.Log(ball.transform.position.x.ToString());
             if (ball.transform.position.x >-5)
                 yield return RunStatus.Success;
             else
@@ -171,23 +172,24 @@ public class NewBehaviourTree3 : MonoBehaviour
                              )
                          ),
                         this.hitGround(ball),
-                        //new Selector
-                        //(
-                        //    this.outOfYard(ball),
-                        //    new SequenceParallel
-                        //    (
-                        //        new Sequence
-                        //        (
-                        //            this.wander(peopleA, wander1, wander2),
-                        //            new LeafWait(6000)
-                        //         ),
-                        //        new Sequence
-                        //        (
-                        //            this.move(peopleB, meetpoint),
-                        //            this.sayHi(peopleB, peopleC)
-                        //        )
-                        //     )
-                        //),
+                        new Selector
+                        (
+                            this.outOfYard(ball) ,//new LeafWait(100000000)
+                            new SequenceParallel
+                            (
+                                 new Sequence
+                                (
+                                    this.wander(peopleA, wander1, wander2),
+                                    new LeafWait(6000)
+                                 ),
+                                new Sequence
+                                (
+                                    this.move(peopleB, meetpoint),
+                                    this.sayHi(peopleB, peopleC)
+                                )
+                            )
+                         ),
+
                         new Sequence
                         (
                             this.move(peopleB, ball.transform, true),
