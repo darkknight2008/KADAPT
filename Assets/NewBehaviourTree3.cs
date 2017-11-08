@@ -65,7 +65,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         return true;
     }
 
-    public class isHitGround : Node
+   public class isHitGround : Node
     {
         protected GameObject ball;
         public isHitGround(GameObject ball)
@@ -74,10 +74,16 @@ public class NewBehaviourTree3 : MonoBehaviour
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            if (ball.transform.position.y < 0.6 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
-                yield return RunStatus.Success;
-            else
-                yield return RunStatus.Failure ;
+            while (true)
+            {
+                if (ball.transform.position.y < 0.1 && ball.GetComponent<Rigidbody>().velocity.magnitude < 1)
+                {
+                    yield return RunStatus.Success;
+                    yield break;
+                }
+                else
+                    yield return RunStatus.Running;
+            }
         }
     }
     protected Node hitGround(GameObject ball)
@@ -165,7 +171,10 @@ public class NewBehaviourTree3 : MonoBehaviour
                                     this.throwBall(ball)
                                  )
                              ),
-                            this.hitGround(ball),
+                             new SuccessLoop(
+                                new Selector (
+                                this.hitGround(ball),
+                            new LeafWait(5000))),
                             new Selector
                             (
                                 this.outOfYard(ball),
@@ -183,11 +192,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                                     new Sequence
                                     (
                                         this.move(peopleB, this.meetpoint),
-                                        new SequenceParallel
-                                        (
-                                        //this.sayHi(peopleB, peopleC),
-                                        //this.sayHi(peopleC, peopleB)
-                                        )
+                                        this.sayHi(peopleB,peopleC)
                                     )
                                )
                             ),
