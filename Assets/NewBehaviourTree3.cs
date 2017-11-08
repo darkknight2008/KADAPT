@@ -40,9 +40,17 @@ public class NewBehaviourTree3 : MonoBehaviour
 
     }
 
-    protected Node move(GameObject people, Transform target)
+    protected Node move(GameObject people, Transform target, bool stopWhenClose = false)
     {
-        Val<Vector3> position = Val.V(() => target.position);
+        Val<Vector3> position;
+        if (stopWhenClose)
+        {
+            position = Val.V(() => target.position + (people.transform.position - target.position).normalized * 0.6f);
+        }
+        else
+        {
+            position = Val.V(() => target.position);
+        }
         return new Sequence(people.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(1000));
     }
 
@@ -52,8 +60,8 @@ public class NewBehaviourTree3 : MonoBehaviour
     }
     public bool throw_ball(GameObject ball)
     {
-        Vector3 w = new Vector3(-500 * Time.deltaTime, 0, 0);
-        ball.GetComponent<Rigidbody>().AddForce(w * 50);
+        Vector3 w = new Vector3(-5, 2, -2);
+        ball.GetComponent<Rigidbody>().AddForce(w * 200);
         return true;
     }
 
@@ -68,7 +76,7 @@ public class NewBehaviourTree3 : MonoBehaviour
         {
             while (true)
             {
-                if (ball.transform.position.y < 0.2 && ball.GetComponent<Rigidbody>().velocity.magnitude < 0.5)
+                if (ball.transform.position.y < 0.2 && ball.GetComponent<Rigidbody>().velocity.magnitude < 0.05)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -126,7 +134,7 @@ public class NewBehaviourTree3 : MonoBehaviour
     {
         return new SequenceParallel(
             new LeafAssert(() => StartSquat(people)),
-            new LeafWait(542)
+            new LeafWait(552)
         );
     }
 
@@ -140,7 +148,7 @@ public class NewBehaviourTree3 : MonoBehaviour
     {
         return new SequenceParallel(
             new LeafAssert(() => StartStand(people)),
-            new LeafWait(1292)
+            new LeafWait(1302)
         );
     }
 
@@ -150,46 +158,46 @@ public class NewBehaviourTree3 : MonoBehaviour
                         (
                         new Sequence
                         (
-                             new Sequence
-                            (
-                                this.move(peopleA, this.tablepoint),
-                                this.catchBall(peopleA, ball),
-                                this.move(peopleA, this.A0),
-                                new Sequence
-                                (
-                                    this.putBall(peopleA, ball, this.thrower),
-                                    new LeafWait(1000),
-                                    this.throwBall(ball)
-                                 )
-                             ),
-                            this.hitGround(ball),
-                            new Selector
-                            (
-                                this.outOfYard(ball),
-                                new SequenceParallel
-                                (
-                                    new Sequence
-                                    (
-                                        this.wander(peopleA, wander1, wander2),
-                                        new LeafWait(6000)
-                                     ),
-                                    new Sequence
-                                    (
-                                        this.move(peopleB, meetpoint),
-                                        this.sayHi(peopleB, peopleC)
-                                    )
-                                 )
-                            ),
+                         new Sequence
+                        (
+                            this.move(peopleA, this.tablepoint, true),
+                            this.catchBall(peopleA, ball),
+                            this.move(peopleA, this.A0),
                             new Sequence
                             (
-                                this.move(peopleB, ballpoint),
-                                this.squat(peopleB), this.catchBall(peopleB, ball),
-                                this.catchBall(peopleB, ball),
-                                 this.stand(peopleB),
-                                this.move(peopleB, tablepoint),
-                                this.putBall(peopleB, ball, this.table),
-                                this.move(peopleB, this.B0)
-                            )
+                                this.putBall(peopleA, ball, this.thrower),
+                                new LeafWait(1000),
+                                this.throwBall(ball)
+                             )
+                         ),
+                        this.hitGround(ball),
+                        //new Selector
+                        //(
+                        //    this.outOfYard(ball),
+                        //    new SequenceParallel
+                        //    (
+                        //        new Sequence
+                        //        (
+                        //            this.wander(peopleA, wander1, wander2),
+                        //            new LeafWait(6000)
+                        //         ),
+                        //        new Sequence
+                        //        (
+                        //            this.move(peopleB, meetpoint),
+                        //            this.sayHi(peopleB, peopleC)
+                        //        )
+                        //     )
+                        //),
+                        new Sequence
+                        (
+                            this.move(peopleB, ball.transform, true),
+                            this.squat(peopleB),
+                            this.catchBall(peopleB, ball),
+                            this.stand(peopleB),
+                            this.move(peopleB, tablepoint, true),
+                            this.putBall(peopleB, ball, this.ballpoint),
+                            this.move(peopleB, this.B0)
+                        )
                         )
                     );
         return roaming;
@@ -254,6 +262,7 @@ public class NewBehaviourTree3 : MonoBehaviour
                     participant.GetComponent<IKtest>().rightHandObj = ball.transform;
                     participant.GetComponent<IKtest>().lookObj = ball.transform;
                     participant.GetComponent<IKtest>().time = (float)this.stopwatch.ElapsedMilliseconds / (float)this.actionTime;
+                    Dummy.transform.position = ball.transform.position;
                 }
                 else
                 {

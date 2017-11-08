@@ -12,6 +12,7 @@ public class ballpoint : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.position  = ball.transform.position+new Vector3(1f,0,0);
+        //transform.position = ball.transform.position + new Vector3(1f,0,0);
+        transform.position = ball.transform.position;
     }
 }
