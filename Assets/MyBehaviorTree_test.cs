@@ -6,9 +6,14 @@ using TreeSharpPlus;
 public class MyBehaviorTree_test : MonoBehaviour
 {
 
-    public GameObject ChrA, ChrB, ChrC;
-    public bool stWave1;
-    public bool stWave2;
+    public GameObject King, Hero, Dying, Zombie;
+    //public bool stWave1;
+    //public bool stWave2;
+    public Transform wander1, wander2, wander3, wander4;
+    //public Transform meetC;
+    //public Transform fetchBall;
+    private Vector3 reach_posi;
+
 
     private BehaviorAgent behaviorAgent;
     // Use this for initialization
@@ -22,77 +27,131 @@ public class MyBehaviorTree_test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
+        Vector3 hero_posi = Hero.GetComponent<Transform>().position;
+        reach_posi = 0.20f * hero_posi + 0.80f * zombie_posi;
     }
 
- 
+
     protected Node BuildTreeRoot()
     {
-        Node roaming = new DecoratorLoop(new Sequence(this.sayHi(ChrB,ChrC),new LeafWait(100)));
-        //return this.sayHi(ChrB, ChrC);
+        //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
+        //Node roaming =new DecoratorLoop( new Sequence(this.Assign_task(King,Hero),new LeafWait(6000)));
+        Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000)));
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Zombie, wander1, wander2), this.wander(Hero, wander3, wander4)), new LeafWait(1000)));
         return roaming;
     }
-    protected Node sayHi(GameObject ppl1, GameObject ppl2)
+    protected Node Bite(GameObject Zombie, GameObject Hero)
     {
-        Animator animator1 = ppl1.GetComponent<Animator>();
-        Animator animator2 = ppl2.GetComponent<Animator>();
-        return new Sequence(this.Greeting(animator1, animator2),new LeafWait(1000), this.Talking(animator1),this.response(animator2));
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator zombie_ani = Zombie.GetComponent<Animator>();
+        return new Sequence(new LeafAssert(() => this.Hero_stop(hero_ani)), this.Biting(Zombie, Hero), new LeafWait(200), this.HeroDies(hero_ani));
     }
-    protected Node Greeting(Animator animator1, Animator animator2)
+    public bool Hero_stop(Animator hero)
     {
-        //return new SelectorParallel(new LeafInvoke(() => this.Greet(animator1, animator2)),new LeafWait(100));
-        return new Sequence(new LeafAssert(() => this.Greet(animator1,1)),new LeafWait(1000), new LeafAssert(() => this.Greet(animator2,2)));
-        //return new LeafAssert(() => this.Greet(animator1,animator2));
-    }
-    protected Node Talking(Animator animator1)
-    {
-        return new SelectorParallel(new LeafAssert(() => this.pointing(animator1)), new LeafWait(1000));
-        //new LeafInvoke(() => this.pointing(animator1))
-    }
-    protected Node response(Animator animator2)
-    {
-        return new Sequence(new LeafAssert(()=> this.responsing(animator2)),new LeafWait(1000));
-    }
-    public bool Greet(Animator m_Animator, int index)
-    {
-        AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);;
-        if (index == 1)
-        {
-            if (stWave1)
-            {
-                m_Animator.SetTrigger("H_Wave");
-                stWave1 = false;
-            }
-        }
-        else
-        {
-            if (stWave2)
-            {
-                m_Animator.SetTrigger("H_Wave");
-                stWave2 = false;
-            }
-        }
+        hero.SetTrigger("Idle");
         return true;
     }
-    public bool pointing(Animator m_Animator1)
+    protected Node Biting(GameObject Zombie, GameObject Hero)
     {
-        AnimatorStateInfo state1 = m_Animator1.GetCurrentAnimatorStateInfo(0);
-        bool isPoint = state1.IsName("LookUp");
+        Animator zombie_ani = Zombie.GetComponent<Animator>();
+        //Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
+        //Vector3 hero_posi = Hero.GetComponent<Transform>().position;
+        //Vector3 reach_posi = 0.50f * hero_posi+0.50f*zombie_posi;
+        Val<Vector3> reach = Val.V(() => reach_posi);
+        return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+    }
+    protected Node turn_move(GameObject Zombie, Val<Vector3> reach)
+    {
+        return new Sequence(Zombie.GetComponent<BehaviorMecanim>().Node_GoTo(reach), new LeafWait(100));
+    }
+    public bool Bite_hero(Animator zombie)
+    {
+        zombie.SetTrigger("Bite");
+        return true;
+    }
+    protected Node HeroDies(Animator hero)
+    {
+        return new Sequence(new LeafWait(500), new LeafAssert(() => this.HeroDying(hero)));
+    }
+    public bool HeroDying(Animator hero)
+    {
+        hero.SetTrigger("B_Dying");
+        return true;
+    }
 
-        m_Animator1.SetTrigger("H_LookUp");
-        if (isPoint)
-        {
-            m_Animator1.SetTrigger("Idle");
-        }
-        return true;
-    
-    }
-    public bool responsing(Animator animator)
+    protected Node wander(GameObject ppl0, Transform wander1, Transform wander2)
     {
-        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-        bool isSurprise = state.IsName("Surprised");
-        animator.SetTrigger("H_Think");
+        Animator animator0 = ppl0.GetComponent<Animator>();
+        return new Sequence(ST_ApproachAndWait(ppl0, wander1), ST_ApproachAndWait(ppl0, wander2));
+    }
+    protected Node ST_ApproachAndWait(GameObject ppl, Transform target)
+    {
+        Val<Vector3> position = Val.V(() => target.position);
+        return new Sequence(ppl.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(100));
+    }
+    protected Node Assign_task(GameObject King, GameObject Hero)
+    {
+        Animator king_ani = King.GetComponent<Animator>();
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        return new Sequence(this.Greeting(king_ani), this.Bowing(hero_ani), this.Talking(king_ani), this.Kneeldown(hero_ani));
+    }
+    protected Node Greeting(Animator chr)
+    {
+        return new Sequence(new LeafAssert(() => this.Greet(chr)), new LeafWait(1000), new LeafAssert(() => this.StopGreeting(chr)));
+
+    }
+    public bool Greet(Animator m_Animator)
+
+    {
+        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
+        m_Animator.SetTrigger("H_Wave");
         return true;
     }
+    public bool StopGreeting(Animator m_Animator)
+
+    {
+        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
+        m_Animator.SetTrigger("Idle");
+        return true;
+    }
+    protected Node Bowing(Animator chr)
+    {
+        return new Sequence(new LeafAssert(() => this.Bow(chr)), new LeafWait(1000));
+
+    }
+    public bool Bow(Animator m_Animator)
+
+    {
+        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
+        m_Animator.SetTrigger("bow");
+        return true;
+    }
+
+    protected Node Talking(Animator chr)
+    {
+        return new Sequence(new LeafAssert(() => this.Talk(chr)), new LeafWait(2500));
+
+    }
+    public bool Talk(Animator m_Animator)
+
+    {
+        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
+        m_Animator.SetTrigger("talk_tasks");
+        return true;
+    }
+    protected Node Kneeldown(Animator chr)
+    {
+        return new Sequence(new LeafAssert(() => this.Kneel(chr)), new LeafWait(1000));
+
+    }
+    public bool Kneel(Animator m_Animator)
+
+    {
+        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
+        m_Animator.SetTrigger("Kneel");
+        return true;
+    }
+
 }
 
