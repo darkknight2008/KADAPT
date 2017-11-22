@@ -7,13 +7,11 @@ public class MyBehaviorTree_test : MonoBehaviour
 {
 
     public GameObject King, Hero, Dying, Zombie;
-    //public bool stWave1;
-    //public bool stWave2;
     public Transform wander1, wander2, wander3, wander4;
-    //public Transform meetC;
-    //public Transform fetchBall;
-    private Vector3 reach_posi;
+    public bool Passwords = false;
 
+    private Vector3 reach_posi;
+    
 
     private BehaviorAgent behaviorAgent;
     // Use this for initialization
@@ -37,9 +35,33 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
         //Node roaming =new DecoratorLoop( new Sequence(this.Assign_task(King,Hero),new LeafWait(6000)));
-        Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000)));
-        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Zombie, wander1, wander2), this.wander(Hero, wander3, wander4)), new LeafWait(1000)));
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000)));
+        Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
         return roaming;
+    }
+    protected Node Salute(GameObject Hero, GameObject Dying)
+    {
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator dying_ani = Dying.GetComponent<Animator>();
+        return new SequenceParallel(new LeafAssert(() => this.saluting(hero_ani)), new LeafAssert(() => this.saluting(dying_ani)));
+    }
+    public bool saluting(Animator chr)
+    {
+        chr.SetTrigger("Salute");
+        return true;
+    }
+    protected Node Tell(GameObject Hero,GameObject Dying)
+    {
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator dying_ani = Dying.GetComponent<Animator>();
+        return new Sequence(new LeafAssert(()=> this.Telling_secret(dying_ani)),new LeafWait(10000),new LeafAssert(()=> this.StopWorking(hero_ani)));
+        
+    }
+    public bool Telling_secret(Animator dying_ani)
+    {
+        dying_ani.SetTrigger("Tell_secret");
+        Passwords = true;
+        return true;
     }
     protected Node Bite(GameObject Zombie, GameObject Hero)
     {
@@ -98,7 +120,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     }
     protected Node Greeting(Animator chr)
     {
-        return new Sequence(new LeafAssert(() => this.Greet(chr)), new LeafWait(1000), new LeafAssert(() => this.StopGreeting(chr)));
+        return new Sequence(new LeafAssert(() => this.Greet(chr)), new LeafWait(1000), new LeafAssert(() => this.StopWorking(chr)));
 
     }
     public bool Greet(Animator m_Animator)
@@ -108,7 +130,7 @@ public class MyBehaviorTree_test : MonoBehaviour
         m_Animator.SetTrigger("H_Wave");
         return true;
     }
-    public bool StopGreeting(Animator m_Animator)
+    public bool StopWorking(Animator m_Animator)
 
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
