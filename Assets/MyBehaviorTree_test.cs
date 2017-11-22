@@ -9,7 +9,8 @@ public class MyBehaviorTree_test : MonoBehaviour
     public GameObject King, Hero, Dying, Zombie;
     public Transform wander1, wander2, wander3, wander4;
     public bool Passwords = false;
-
+    public bool Failure = false;
+    public bool Success = true;
     private Vector3 reach_posi;
     
 
@@ -28,6 +29,19 @@ public class MyBehaviorTree_test : MonoBehaviour
         Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         reach_posi = 0.20f * hero_posi + 0.80f * zombie_posi;
+        if (Passwords)
+        {
+            //make door open and show the lines
+        }
+        if (Success)
+        {
+            //show the text
+        }
+        if (Failure)
+        {
+            //Show the text
+        }
+
     }
 
 
@@ -35,8 +49,8 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
         //Node roaming =new DecoratorLoop( new Sequence(this.Assign_task(King,Hero),new LeafWait(6000)));
-        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000)));
-        Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
+        Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
+        //Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
         return roaming;
     }
     protected Node Salute(GameObject Hero, GameObject Dying)
@@ -77,9 +91,6 @@ public class MyBehaviorTree_test : MonoBehaviour
     protected Node Biting(GameObject Zombie, GameObject Hero)
     {
         Animator zombie_ani = Zombie.GetComponent<Animator>();
-        //Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
-        //Vector3 hero_posi = Hero.GetComponent<Transform>().position;
-        //Vector3 reach_posi = 0.50f * hero_posi+0.50f*zombie_posi;
         Val<Vector3> reach = Val.V(() => reach_posi);
         return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
     }
@@ -101,7 +112,11 @@ public class MyBehaviorTree_test : MonoBehaviour
         hero.SetTrigger("B_Dying");
         return true;
     }
-
+    public bool GameOver()
+    {
+        Failure = true;
+        return true;
+    }
     protected Node wander(GameObject ppl0, Transform wander1, Transform wander2)
     {
         Animator animator0 = ppl0.GetComponent<Animator>();
