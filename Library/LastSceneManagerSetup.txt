@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_Scenes/B4.unity
+- path: D:/Rutgers_courses/523ComputerGraphics/Assignments/Unity/B4/Unity/KADAPT/Assets/_Scenes/B4.unity
   isLoaded: 1
   isActive: 1

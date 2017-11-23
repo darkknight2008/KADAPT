@@ -98,8 +98,8 @@ public class MyBehaviorTree_test : MonoBehaviour
     protected Node BuildTreeRoot()
     {
         //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
-        //Node roaming =new DecoratorLoop( new Sequence(this.Assign_task(King,Hero),new LeafWait(6000)));
-        Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
+        Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
         //Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
         return roaming;
     }
@@ -206,7 +206,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     }
     protected Node Bowing(Animator chr)
     {
-        return new Sequence(new LeafAssert(() => this.Bow(chr)), new LeafWait(1000));
+        return new Sequence(new LeafAssert(() => this.Bow(chr)), new LeafWait(100));
 
     }
     public bool Bow(Animator m_Animator)
@@ -232,7 +232,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     }
     protected Node Kneeldown(Animator chr)
     {
-        return new Sequence(new LeafAssert(() => this.Kneel(chr)), new LeafWait(1000));
+        return new Sequence(new LeafAssert(() => this.Kneel(chr)), new LeafWait(7000));
 
     }
     public bool Kneel(Animator m_Animator)
