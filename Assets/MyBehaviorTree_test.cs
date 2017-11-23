@@ -8,7 +8,10 @@ public class MyBehaviorTree_test : MonoBehaviour
 
     public GameObject King, Hero, Dying, Zombie;
     public Transform wander1, wander2, wander3, wander4;
+    public bool Task = false;
+    public bool Accept = false;
     public bool Passwords = false;
+    public bool Disappear = false;
     public bool Failure = false;
     public bool Success = true;
     private Vector3 reach_posi;
@@ -150,6 +153,8 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("Idle");
+        Disappear = true;
+        Passwords = false;
         return true;
     }
     protected Node Bowing(Animator chr)
@@ -175,6 +180,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("talk_tasks");
+        Task = true;
         return true;
     }
     protected Node Kneeldown(Animator chr)
@@ -187,6 +193,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("Kneel");
+        Accept = true;
         return true;
     }
 
