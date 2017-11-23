@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using TreeSharpPlus;
+using UnityEngine.UI;
 
 public class MyBehaviorTree_test : MonoBehaviour
 {
@@ -15,6 +16,13 @@ public class MyBehaviorTree_test : MonoBehaviour
     public bool Failure = false;
     public bool Success = true;
     private Vector3 reach_posi;
+
+    public Text falseText;
+    public Text winText;
+    public Text assignText;
+    public Text dyingText;
+    public Camera cam;
+
     
 
     private BehaviorAgent behaviorAgent;
@@ -24,6 +32,11 @@ public class MyBehaviorTree_test : MonoBehaviour
         behaviorAgent = new BehaviorAgent(this.BuildTreeRoot());
         BehaviorManager.Instance.Register(behaviorAgent);
         behaviorAgent.StartBehavior();
+        falseText.text = "";
+        winText.text = "";
+        assignText.text = "";
+        dyingText.text = "";
+
     }
 
     // Update is called once per frame
@@ -32,21 +45,55 @@ public class MyBehaviorTree_test : MonoBehaviour
         Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         reach_posi = 0.20f * hero_posi + 0.80f * zombie_posi;
-        if (Passwords)
+        //if (Passwords)
+        //{
+        //    //make door open and show the lines
+        //}
+        if (Success == true)
         {
-            //make door open and show the lines
+            winText.text = "Congratulations!";
         }
-        if (Success)
+        if (Failure == true)
         {
-            //show the text
+            falseText.text = "OOPS, Zombie killed you!";
         }
-        if (Failure)
+        if (Task == true)
         {
-            //Show the text
+            PositionTransKing(assignText);
+            assignText.text = "HERO, Eric knew where to find sword, help him!";
         }
-
+        if (Accept == true)
+        {
+            PositionTransKing(assignText);
+            assignText.text = "";
+        }
+        if (Passwords == true)
+        {
+            PositionTransDead(dyingText);
+            dyingText.text = "I can't go with you, go and get the sword!!!";
+        }
+        if (Disappear == true)
+        {
+            PositionTransDead(dyingText);
+            dyingText.text = "";
+        }
     }
 
+    public void PositionTransKing(Text assignText)
+    {
+        Vector3 worldPosition = new Vector3(King.transform.position.x, King.transform.position.y, King.transform.position.z);
+        Vector2 position = cam.WorldToScreenPoint(worldPosition);
+        position = new Vector2(position.x, position.y);
+        assignText.transform.position = position;
+    }
+
+    public void PositionTransDead(Text dyingText)
+    {
+        Vector3 worldPosition = new Vector3(Dying.transform.position.x, Dying.transform.position.y, Dying.transform.position.z);
+        Vector2 position = cam.WorldToScreenPoint(worldPosition);
+        position = new Vector2(position.x, position.y);
+        dyingText.transform.position = position;
+    }
 
     protected Node BuildTreeRoot()
     {
