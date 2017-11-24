@@ -113,7 +113,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) < 6)
+                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) < 5)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -141,7 +141,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, Dying.transform.position) < 4)
+                if (Vector3.Distance(Hero.transform.position, Dying.transform.position) < 3)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -169,7 +169,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, sword.transform.position) < 4)
+                if (Vector3.Distance(Hero.transform.position, sword.transform.position) < 3)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -198,7 +198,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, door.transform.position) < 4 && keyGot == true)
+                if (Vector3.Distance(Hero.transform.position, door.transform.position) < 2 && keyGot == true)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -283,7 +283,8 @@ public class MyBehaviorTree_full : MonoBehaviour
                         this.canBite(Zombie1, Hero)
                     )
                 ),
-                this.ZombieBite(Zombie1, Hero)
+                this.ZombieBite(Zombie1, Hero),
+                new LeafWait(100000)
             );
         Node zombie2wander = new Sequence
             (
@@ -299,7 +300,8 @@ public class MyBehaviorTree_full : MonoBehaviour
                         this.canBite(Zombie2, Hero)
                     )
                 ),
-                this.ZombieBite(Zombie2, Hero)
+                this.ZombieBite(Zombie2, Hero),
+                new LeafWait(100000)
             );
         Node zombie3wander = new Sequence
             (
@@ -316,7 +318,8 @@ public class MyBehaviorTree_full : MonoBehaviour
                         this.canBite(Zombie3, Hero)
                     )
                 ),
-                this.ZombieBite(Zombie3, Hero)
+                this.ZombieBite(Zombie3, Hero),
+                new LeafWait(100000)
             );
         Node openDoor = new Sequence
             (
@@ -371,14 +374,14 @@ public class MyBehaviorTree_full : MonoBehaviour
     //Text
     public void PositionTransKing(Text assignText)
     {
-        Vector3 worldPosition = new Vector3(King.transform.position.x, King.transform.position.y, King.transform.position.z);
+        Vector3 worldPosition = new Vector3(King.transform.position.x, King.transform.position.y, King.transform.position.z)+new Vector3(0,1.5f,0);
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         assignText.transform.position = position;
     }
     public void PositionTransDead(Text dyingText)
     {
-        Vector3 worldPosition = new Vector3(Dying.transform.position.x, Dying.transform.position.y, Dying.transform.position.z);
+        Vector3 worldPosition = new Vector3(Dying.transform.position.x, Dying.transform.position.y, Dying.transform.position.z)+new Vector3(0,1.5f,0);
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         dyingText.transform.position = position;
@@ -406,7 +409,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, King.transform.position) < 4)
+                if (Vector3.Distance(Hero.transform.position, King.transform.position) < 2)
                 {
                     yield return RunStatus.Success;
                     yield break;

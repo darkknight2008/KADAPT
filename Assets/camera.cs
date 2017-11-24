@@ -77,7 +77,7 @@ public class camera : MonoBehaviour
 
         R0t = player.transform.rotation * Quaternion.Inverse(initPlayerRotation);
         transform.position = player.transform.position + R0t * camerPositionLocal * cameraDistanceScale;
-        Q.SetLookRotation(player.transform.position - transform.position);
+        Q.SetLookRotation(player.transform.position + new Vector3 (0,1.2f,0) - transform.position);
         transform.rotation = Q;
         //transform.rotation = R0t * Rscript * initCameraRotation;
     }
