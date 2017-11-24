@@ -69,10 +69,10 @@ public class MyBehaviorTree_full : MonoBehaviour
         reach_posi1 = 0.20f * hero_posi + 0.80f * zombie1_posi;
         reach_posi2 = 0.20f * hero_posi + 0.80f * zombie2_posi;
         reach_posi3 = 0.20f * hero_posi + 0.80f * zombie3_posi;
-        //if (Success == true)
-        //{
-        //    winText.text = "Congratulations!";
-        //}
+        if (Success == true)
+        {
+            winText.text = "Congratulations!";
+        }
         if (Failure == true)
         {
             failtext.text = "OOPS, Zombie killed you!";
@@ -99,7 +99,6 @@ public class MyBehaviorTree_full : MonoBehaviour
         }
 
     }
-
 
     public class canGotBite : Node
     {
@@ -338,14 +337,14 @@ public class MyBehaviorTree_full : MonoBehaviour
                 this.switchKey(keyGot),
                 new LeafWait(1000000000000)
             );
-        //Node getSword = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            this.getSword(Hero, sword)
-        //        ),
-        //        this.HE(winText)
-        //    );
+        Node getSword = new Sequence
+            (
+                new SuccessLoop
+                (
+                    this.getSword(Hero, sword)
+                ),
+                new LeafAssert(()=> this.HE())
+            );
 
         //Node root = new DecoratorLoop( new Sequence
         Node root = new Sequence
@@ -355,13 +354,13 @@ public class MyBehaviorTree_full : MonoBehaviour
                 (
                      new SelectorParallel
                      (
-                          //openDoor,
+                          openDoor,
                           getKey,
-                          //zombie1wander,
-                          //zombie2wander,
-                          //zombie3wander
-                          new LeafWait(10000000000000)
-                          //getSword
+                          zombie1wander,
+                          zombie2wander,
+                          zombie3wander,
+                          //new LeafWait(10000000000000)
+                          getSword
                     )
                 ),
                 new LeafWait(100000000000)
@@ -383,6 +382,11 @@ public class MyBehaviorTree_full : MonoBehaviour
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         dyingText.transform.position = position;
+    }
+    public bool HE()
+    {
+        Success = true;
+        return true;
     }
     // task
     protected Node task(GameObject King,GameObject Hero)
