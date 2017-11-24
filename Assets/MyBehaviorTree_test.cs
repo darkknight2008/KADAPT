@@ -10,9 +10,9 @@ public class MyBehaviorTree_test : MonoBehaviour
     public GameObject King, Hero, Dying, Zombie;
     public Transform wander1, wander2, wander3, wander4;
     public bool Task = false;
-    public bool Accept = false;
+    //public bool Accept = false;
     public bool Passwords = false;
-    public bool Disappear = false;
+    //public bool Disappear = false;
     public bool Failure = false;
     public bool Success = true;
     private Vector3 reach_posi;
@@ -62,21 +62,30 @@ public class MyBehaviorTree_test : MonoBehaviour
             PositionTransKing(assignText);
             assignText.text = "HERO, Eric knew where to find sword, help him!";
         }
-        if (Accept == true)
-        {
+        else {
             PositionTransKing(assignText);
             assignText.text = "";
         }
+        //if (Accept == true)
+        //{
+        //    PositionTransKing(assignText);
+        //    assignText.text = "";
+        //}
         if (Passwords == true)
         {
             PositionTransDead(dyingText);
             dyingText.text = "I can't go with you, go and get the sword!!!";
         }
-        if (Disappear == true)
+        else
         {
             PositionTransDead(dyingText);
             dyingText.text = "";
         }
+        //if (Disappear == true)
+        //{
+        //    PositionTransDead(dyingText);
+        //    dyingText.text = "";
+        //}
     }
 
     public void PositionTransKing(Text assignText)
@@ -98,9 +107,11 @@ public class MyBehaviorTree_test : MonoBehaviour
     protected Node BuildTreeRoot()
     {
         //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
-        Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
-        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(this.wander(Hero, wander1, wander2), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
+        //Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
+        //new SequenceParallel(new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>())),new LeafWait(70000))this.wander(Hero, wander1, wander2)
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(new LeafWait(2000), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
         //Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
+        Node roaming = new DecoratorLoop(new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying)));
         return roaming;
     }
     protected Node Salute(GameObject Hero, GameObject Dying)
@@ -118,7 +129,7 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         Animator hero_ani = Hero.GetComponent<Animator>();
         Animator dying_ani = Dying.GetComponent<Animator>();
-        return new Sequence(new LeafAssert(()=> this.Telling_secret(dying_ani)),new LeafWait(10000),new LeafAssert(()=> this.StopWorking(hero_ani)));
+        return new Sequence(new LeafWait(2000),new LeafAssert(()=> this.Telling_secret(dying_ani)),new LeafWait(8000),new LeafAssert(()=> this.StopWorking(hero_ani)),new LeafWait(1500));
         
     }
     public bool Telling_secret(Animator dying_ani)
@@ -200,8 +211,10 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("Idle");
-        Disappear = true;
-        Passwords = false;
+        if (m_Animator == Hero.GetComponent<Animator>())
+        {
+            Passwords = false;
+        }
         return true;
     }
     protected Node Bowing(Animator chr)
@@ -212,14 +225,13 @@ public class MyBehaviorTree_test : MonoBehaviour
     public bool Bow(Animator m_Animator)
 
     {
-        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("bow");
         return true;
     }
 
     protected Node Talking(Animator chr)
     {
-        return new Sequence(new LeafAssert(() => this.Talk(chr)), new LeafWait(2500));
+        return new Sequence(new LeafAssert(() => this.Talk(chr)), new LeafWait(4000),new LeafAssert(()=> this.Say(chr)),new LeafWait(2000));
 
     }
     public bool Talk(Animator m_Animator)
@@ -227,6 +239,11 @@ public class MyBehaviorTree_test : MonoBehaviour
     {
         // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("talk_tasks");
+        return true;
+    }
+    public bool Say(Animator m_Animator)
+
+    {
         Task = true;
         return true;
     }
@@ -238,9 +255,8 @@ public class MyBehaviorTree_test : MonoBehaviour
     public bool Kneel(Animator m_Animator)
 
     {
-        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("Kneel");
-        Accept = true;
+        Task = false;
         return true;
     }
 
