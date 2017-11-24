@@ -15,6 +15,6 @@ public class ResetScene : MonoBehaviour {
 
 	}
     public void RestartGame() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("B4");
     }
 }

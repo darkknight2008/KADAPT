@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KADAPT", "KADAPT.csproj", "{7F19BE05-6001-79D1-BD1B-EB97BE873699}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KADAPT.Editor", "KADAPT.Editor.csproj", "{EB71DDF2-88CB-D1C8-48E5-0A219CDA588A}"
