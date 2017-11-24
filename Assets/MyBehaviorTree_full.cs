@@ -38,6 +38,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public Text assignText;
     public Text dyingText;
     public Camera cam;
+    public DoorHoldOn D;
 
     private Vector3 reach_posi;
     private Vector3 reach_posi1;
@@ -57,6 +58,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         winText.text = "";
         assignText.text = "";
         dyingText.text = "";
+	D = door.GetComponent<DoorHoldOn>();
     }
 
     // Update is called once per frame
@@ -97,7 +99,10 @@ public class MyBehaviorTree_full : MonoBehaviour
             PositionTransDead(dyingText);
             dyingText.text = "";
         }
-
+	if (keyGot==true)
+        {
+            D.key_get = true;
+        }
     }
 
     public class canGotBite : Node
@@ -593,6 +598,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         dying_ani.SetTrigger("Tell_secret");
         Passwords = true;
+	keyGot = true;
         return true;
     }
 
