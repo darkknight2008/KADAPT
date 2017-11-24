@@ -136,6 +136,38 @@ public class CharacterMecanim : MonoBehaviour
         return RunStatus.Running;
         // TODO: Timeout? - AS
     }
+    public virtual RunStatus NavGoToRandom(Val<Vector3> center, float radius)
+    {
+        int i = 0;
+        Vector3 target = center.Value;
+        Vector3 rand;
+        while (i==0 || (i<100 && this.Body.NavCanReach(target) == false))
+        {
+            i += 1;
+            rand = UnityEngine.Random.onUnitSphere;
+            target = center.Value + radius * rand;
+        }
+        if (this.Body.NavCanReach(center.Value) == false)
+        {
+            Debug.LogWarning("NavGoTo failed -- can't reach target");
+            return RunStatus.Failure;
+        }
+        // TODO: I previously had this if statement here to prevent spam:
+        //     if (this.Interface.NavTarget() != target)
+        // It's good for limiting the amount of SetDestination() calls we
+        // make internally, but sometimes it causes the character1 to stand
+        // still when we re-activate a tree after it's been terminated. Look
+        // into a better way to make this smarter without false positives. - AS
+        this.Body.NavGoTo(target);
+        return RunStatus.Success;
+        //if (this.Body.NavHasArrived() == true)
+        //{
+        //    this.Body.NavStop();
+        //    return RunStatus.Success;
+        //}
+        //return RunStatus.Running;
+        // TODO: Timeout? - AS
+    }
 
     /// <summary>
     /// Lerps the character towards a target. Use for precise adjustments.

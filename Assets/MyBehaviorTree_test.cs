@@ -97,8 +97,8 @@ public class MyBehaviorTree_test : MonoBehaviour
 
         //Three animations
         //Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
-        Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(new LeafWait(2000), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
-        //Node roaming = new DecoratorLoop(new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying)));
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(new LeafWait(2000), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
+        Node roaming = new DecoratorLoop(new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying)));
         return roaming;
     }
     protected Node Salute(GameObject Hero, GameObject Dying)

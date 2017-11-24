@@ -14,6 +14,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public Transform wander4;
     public Transform wander5;
     public Transform wander6;
+    public float radius;
 
     public GameObject door;
     public GameObject sword;
@@ -86,16 +87,16 @@ public class MyBehaviorTree_full : MonoBehaviour
             PositionTransKing(assignText);
             assignText.text = "";
         }
-        //if (Passwords == true)
-        //{
-        //    PositionTransDead(dyingText);
-        //    dyingText.text = "I can't go with you, go and get the sword!!!";
-        //}
-        //else
-        //{
-        //    PositionTransDead(dyingText);
-        //    dyingText.text = "";
-        //}
+        if (Passwords == true)
+        {
+            PositionTransDead(dyingText);
+            dyingText.text = "I can't go with you, go and get the sword!!!";
+        }
+        else
+        {
+            PositionTransDead(dyingText);
+            dyingText.text = "";
+        }
 
     }
 
@@ -277,8 +278,8 @@ public class MyBehaviorTree_full : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            //this.wander(this.wander1)
-                            wander(Zombie1,wander1,wander2)
+                            this.Randomwalk(Zombie1, this.wander1, 3.0f, 1000)
+                            //this.wander(Zombie1,wander1,wander2)
                         ),
                         this.canBite(Zombie1, Hero)
                     )
@@ -293,7 +294,8 @@ public class MyBehaviorTree_full : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.wander(Zombie2, wander3, wander4)
+                            this.Randomwalk(Zombie2, this.wander3, 3.0f, 1000)
+                            //this.wander(Zombie2, wander3, wander4)
                         ),
                         this.canBite(Zombie2, Hero)
                     )
@@ -308,7 +310,9 @@ public class MyBehaviorTree_full : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.wander(Zombie3, wander5, wander6)
+                            this.Randomwalk(Zombie3, this.wander5, 3.0f, 1000)
+                            //this.wander(Zombie3, wander5, wander6)
+
                         ),
                         this.canBite(Zombie3, Hero)
                     )
@@ -324,16 +328,16 @@ public class MyBehaviorTree_full : MonoBehaviour
                 this.switchDoor(door),
                 new LeafWait(10000000000000)
             );
-        //Node getKey = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            this.canTalk(Hero, Dying)
-        //        ),
-        //        this.TellKey(Hero, Dying),
-        //        this.switchKey(keyGot),
-        //        new LeafWait(1000000000000)
-        //    );
+        Node getKey = new Sequence
+            (
+                new SuccessLoop
+                (
+                    this.canTalk(Hero, Dying)
+                ),
+                this.TellKey(Hero, Dying),
+                this.switchKey(keyGot),
+                new LeafWait(1000000000000)
+            );
         //Node getSword = new Sequence
         //    (
         //        new SuccessLoop
@@ -352,12 +356,12 @@ public class MyBehaviorTree_full : MonoBehaviour
                      new SelectorParallel
                      (
                           //openDoor,
-                          //getKey,
-                          zombie1wander,
-                          zombie2wander,
-                          zombie3wander,
+                          getKey,
+                          //zombie1wander,
+                          //zombie2wander,
+                          //zombie3wander
                           new LeafWait(10000000000000)
-                    //getSword
+                          //getSword
                     )
                 ),
                 new LeafWait(100000000000)
@@ -372,6 +376,13 @@ public class MyBehaviorTree_full : MonoBehaviour
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         assignText.transform.position = position;
+    }
+    public void PositionTransDead(Text dyingText)
+    {
+        Vector3 worldPosition = new Vector3(Dying.transform.position.x, Dying.transform.position.y, Dying.transform.position.z);
+        Vector2 position = cam.WorldToScreenPoint(worldPosition);
+        position = new Vector2(position.x, position.y);
+        dyingText.transform.position = position;
     }
     // task
     protected Node task(GameObject King,GameObject Hero)
@@ -546,5 +557,48 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         Val<Vector3> position = Val.V(() => target.position);
         return new Sequence(ppl.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(100));
+    }
+
+    //Tell key
+    protected Node TellKey(GameObject Hero, GameObject Dying)
+    {
+        return new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying));
+    }
+    protected Node Salute(GameObject Hero, GameObject Dying)
+    {
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator dying_ani = Dying.GetComponent<Animator>();
+        return new SequenceParallel(new LeafAssert(() => this.saluting(hero_ani)), new LeafAssert(() => this.saluting(dying_ani)));
+    }
+    public bool saluting(Animator chr)
+    {
+        chr.SetTrigger("Salute");
+        return true;
+    }
+    protected Node Tell(GameObject Hero, GameObject Dying)
+    {
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator dying_ani = Dying.GetComponent<Animator>();
+        return new Sequence(new LeafWait(2000), new LeafAssert(() => this.Telling_secret(dying_ani)), new LeafWait(8000), new LeafAssert(() => this.StopWorking(hero_ani)), new LeafWait(1500));
+
+    }
+    public bool Telling_secret(Animator dying_ani)
+    {
+        dying_ani.SetTrigger("Tell_secret");
+        Passwords = true;
+        return true;
+    }
+
+    //Random walk
+    protected Node Randomwalk(GameObject people, Transform center, float radius, int waitingTime)
+    {
+        Val<Vector3> position = Val.V(() => center.position);
+        return new Sequence(
+            people.GetComponent<BehaviorMecanim>().Node_GoToRandom(position, radius),
+            new DecoratorInvert(
+                new DecoratorLoop(
+                    new LeafAssert(
+                        () => Vector3.Distance(people.transform.position, people.GetComponent<UnityEngine.AI.NavMeshAgent>().destination) > 0.1))),
+            new LeafWait(waitingTime));
     }
 }

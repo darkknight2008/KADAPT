@@ -49,6 +49,11 @@ public class BehaviorMecanim : MonoBehaviour
             () => this.Character.NavNudgeTo(targ),
             () => this.Character.NavStop());
     }
+    public Node Node_GoToRandom(Val<Vector3> center, float radius)
+    {
+        return new LeafInvoke(
+            () => this.Character.NavGoToRandom(center, radius));
+    }
 
     //public Node Node_GoAlongPoints(Val<Vector3>[] targ)
     //{
