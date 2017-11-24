@@ -11,15 +11,18 @@ public class MyBehaviorTree_full : MonoBehaviour
 	public Transform wander1;
 	public Transform wander2;
 	public Transform wander3;
+    public Transform wander4;
+    public Transform wander5;
+    public Transform wander6;
 
     public GameObject door;
     public GameObject sword;
 	public GameObject Hero;
 	public GameObject King;
     public GameObject Dying;
-    public GameObject zombie1;
-    public GameObject zombie2;
-    public GameObject zombie3;
+    public GameObject Zombie1;
+    public GameObject Zombie2;
+    public GameObject Zombie3;
     public bool keyGot = false;
 
     //Text boolean variables
@@ -36,6 +39,9 @@ public class MyBehaviorTree_full : MonoBehaviour
     public Camera cam;
 
     private Vector3 reach_posi;
+    private Vector3 reach_posi1;
+    private Vector3 reach_posi2;
+    private Vector3 reach_posi3;
 
     private BehaviorAgent behaviorAgent;
     // Use this for initialization
@@ -55,6 +61,21 @@ public class MyBehaviorTree_full : MonoBehaviour
     // Update is called once per frame
     void Update ()
 	{
+        Vector3 zombie1_posi = Zombie1.GetComponent<Transform>().position;
+        Vector3 zombie2_posi = Zombie2.GetComponent<Transform>().position;
+        Vector3 zombie3_posi = Zombie3.GetComponent<Transform>().position;
+        Vector3 hero_posi = Hero.GetComponent<Transform>().position;
+        reach_posi1 = 0.20f * hero_posi + 0.80f * zombie1_posi;
+        reach_posi2 = 0.20f * hero_posi + 0.80f * zombie2_posi;
+        reach_posi3 = 0.20f * hero_posi + 0.80f * zombie3_posi;
+        //if (Success == true)
+        //{
+        //    winText.text = "Congratulations!";
+        //}
+        if (Failure == true)
+        {
+            failtext.text = "OOPS, Zombie killed you!";
+        }
         if (Task == true)
         {
             PositionTransKing(assignText);
@@ -65,6 +86,17 @@ public class MyBehaviorTree_full : MonoBehaviour
             PositionTransKing(assignText);
             assignText.text = "";
         }
+        //if (Passwords == true)
+        //{
+        //    PositionTransDead(dyingText);
+        //    dyingText.text = "I can't go with you, go and get the sword!!!";
+        //}
+        //else
+        //{
+        //    PositionTransDead(dyingText);
+        //    dyingText.text = "";
+        //}
+
     }
 
 
@@ -237,60 +269,61 @@ public class MyBehaviorTree_full : MonoBehaviour
 
     protected Node BuildTreeRoot()
     {
-        //Node zombie1wander = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            new SelectorParallel
-        //            (
-        //                new DecoratorLoop
-        //                (
-        //                    this.wander(this.wander1)
-        //                ),
-        //                this.canBite(zombie1, Hero)
-        //            )
-        //        ),
-        //        this.bite(zombie1, Hero)
-        //    );
-        //Node zombie2wander = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            new SelectorParallel
-        //            (
-        //                new DecoratorLoop
-        //                (
-        //                    this.wander(this.wander2)
-        //                ),
-        //                this.canBite(zombie2, Hero)
-        //            )
-        //        ),
-        //        this.bite(zombie2, Hero)
-        //    );
-        //Node zombie3wander = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            new SelectorParallel
-        //            (
-        //                new DecoratorLoop
-        //                (
-        //                    this.wander(this.wander3)
-        //                ),
-        //                this.canBite(zombie3, Hero)
-        //            )
-        //        ),
-        //        this.bite(zombie3, Hero)
-        //    );
-        //Node openDoor = new Sequence
-        //    (
-        //        new SuccessLoop
-        //        (
-        //            this.canOpenDoor(Hero, door, keyGot)
-        //        ),
-        //        this.switchDoor(door),
-        //        new LeafWait(10000000000000)
-        //    );
+        Node zombie1wander = new Sequence
+            (
+                new SuccessLoop
+                (
+                    new SelectorParallel
+                    (
+                        new DecoratorLoop
+                        (
+                            //this.wander(this.wander1)
+                            wander(Zombie1,wander1,wander2)
+                        ),
+                        this.canBite(Zombie1, Hero)
+                    )
+                ),
+                this.ZombieBite(Zombie1, Hero)
+            );
+        Node zombie2wander = new Sequence
+            (
+                new SuccessLoop
+                (
+                    new SelectorParallel
+                    (
+                        new DecoratorLoop
+                        (
+                            this.wander(Zombie2, wander3, wander4)
+                        ),
+                        this.canBite(Zombie2, Hero)
+                    )
+                ),
+                this.ZombieBite(Zombie2, Hero)
+            );
+        Node zombie3wander = new Sequence
+            (
+                new SuccessLoop
+                (
+                    new SelectorParallel
+                    (
+                        new DecoratorLoop
+                        (
+                            this.wander(Zombie3, wander5, wander6)
+                        ),
+                        this.canBite(Zombie3, Hero)
+                    )
+                ),
+                this.ZombieBite(Zombie3, Hero)
+            );
+        Node openDoor = new Sequence
+            (
+                new SuccessLoop
+                (
+                    this.canOpenDoor(Hero, door, keyGot)
+                ),
+                this.switchDoor(door),
+                new LeafWait(10000000000000)
+            );
         //Node getKey = new Sequence
         //    (
         //        new SuccessLoop
@@ -314,18 +347,19 @@ public class MyBehaviorTree_full : MonoBehaviour
         Node root = new Sequence
             (
                 this.task(King, Hero),
-                //new SuccessLoop
-                //(
-                //     new SelectorParallel
-                //     (
-                //          openDoor,
-                //          getKey,
-                //          zombie1wander,
-                //          zombie2wander,
-                //          zombie3wander,
-                //          getSword
-                //    )
-                //),
+                new SuccessLoop
+                (
+                     new SelectorParallel
+                     (
+                          //openDoor,
+                          //getKey,
+                          zombie1wander,
+                          zombie2wander,
+                          zombie3wander,
+                          new LeafWait(10000000000000)
+                    //getSword
+                    )
+                ),
                 new LeafWait(100000000000)
                 //new LeafWait(2000))
             );
@@ -411,7 +445,6 @@ public class MyBehaviorTree_full : MonoBehaviour
         m_Animator.SetTrigger("bow");
         return true;
     }
-
     protected Node Talking(Animator chr)
     {
         return new Sequence(new LeafAssert(() => this.Talk(chr)), new LeafWait(4000), new LeafAssert(() => this.Say(chr)), new LeafWait(2000));
@@ -442,5 +475,76 @@ public class MyBehaviorTree_full : MonoBehaviour
         m_Animator.SetTrigger("Kneel");
         Task = false;
         return true;
+    }
+
+    //Zombie bites
+    protected Node ZombieBite(GameObject Zombie, GameObject Hero)
+    {
+        return new Sequence(this.Bite(Zombie, Hero), new LeafWait(1000), new LeafAssert(() => this.GameOver()));
+    }
+    protected Node Bite(GameObject Zombie, GameObject Hero)
+    {
+        Animator hero_ani = Hero.GetComponent<Animator>();
+        Animator zombie_ani = Zombie.GetComponent<Animator>();
+        return new Sequence(new LeafAssert(() => this.Hero_stop(hero_ani)), this.Biting(Zombie, Hero), new LeafWait(200), this.HeroDies(hero_ani));
+    }
+    public bool Hero_stop(Animator hero)
+    {
+        hero.SetTrigger("Idle");
+        return true;
+    }
+    protected Node Biting(GameObject Zombie, GameObject Hero)
+    {
+        Animator zombie_ani = Zombie.GetComponent<Animator>();
+        Val<Vector3> reach;
+        if (Zombie == Zombie1)
+        {
+            reach = Val.V(() => reach_posi1);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }else if (Zombie == Zombie2)
+        {
+            reach = Val.V(() => reach_posi2);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        else
+        {
+            reach = Val.V(() => reach_posi3);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        //reach = Val.V(() => reach_posi1);
+        //return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+    }
+    protected Node turn_move(GameObject Zombie, Val<Vector3> reach)
+    {
+        return new Sequence(Zombie.GetComponent<BehaviorMecanim>().Node_GoTo(reach), new LeafWait(100));
+    }
+    public bool Bite_hero(Animator zombie)
+    {
+        zombie.SetTrigger("Bite");
+        return true;
+    }
+    protected Node HeroDies(Animator hero)
+    {
+        return new Sequence(new LeafWait(500), new LeafAssert(() => this.HeroDying(hero)));
+    }
+    public bool HeroDying(Animator hero)
+    {
+        hero.SetTrigger("B_Dying");
+        return true;
+    }
+    public bool GameOver()
+    {
+        Failure = true;
+        return true;
+    }
+    protected Node wander(GameObject ppl0, Transform wander1, Transform wander2)
+    {
+        Animator animator0 = ppl0.GetComponent<Animator>();
+        return new Sequence(ST_ApproachAndWait(ppl0, wander1), ST_ApproachAndWait(ppl0, wander2));
+    }
+    protected Node ST_ApproachAndWait(GameObject ppl, Transform target)
+    {
+        Val<Vector3> position = Val.V(() => target.position);
+        return new Sequence(ppl.GetComponent<BehaviorMecanim>().Node_GoTo(position), new LeafWait(100));
     }
 }
