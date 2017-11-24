@@ -20,14 +20,17 @@ public class camera : MonoBehaviour
     private float cameraDistanceScale;
     private Vector3 camerPositionLocal;
     private Quaternion Q;
+    private Vector3 offset;
 
     // Use this for initialization
     void Start()
     {
+        offset = new Vector3(0.0f, 1.7f, 0.0f);
+
         initCameraPosition = transform.position;
         initCameraRotation = transform.rotation;
         //player = GameObject.FindGameObjectWithTag("Player");
-        initPlayerPosition = player.transform.position;
+        initPlayerPosition = player.transform.position + offset;
         initPlayerRotation = player.transform.rotation;
         Rscript = Quaternion.identity;
         cameraDistanceScale = 1.0f;
@@ -38,6 +41,8 @@ public class camera : MonoBehaviour
     void Update()
     {
         cameraDistanceScale += - Input.GetAxis("Mouse ScrollWheel")* Time.deltaTime * scaleSpeed;
+
+        cameraDistanceScale = Mathf.Max(0.5f, Mathf.Min(1.5f, cameraDistanceScale));
 
         if (Input.GetButton("Fire1"))
         {
@@ -72,13 +77,20 @@ public class camera : MonoBehaviour
 
         Q.SetFromToRotation(camerPositionLocal, initCameraPosition - initPlayerPosition);
 
-        pv = Vector3.ProjectOnPlane(player.GetComponent<Rigidbody>().velocity, Vector3.up).magnitude;
-        camerPositionLocal = Quaternion.Lerp(Quaternion.identity, Q, Time.deltaTime * pv * backSpeed) * camerPositionLocal;
-
         R0t = player.transform.rotation * Quaternion.Inverse(initPlayerRotation);
-        transform.position = player.transform.position + R0t * camerPositionLocal * cameraDistanceScale;
-        Q.SetLookRotation(player.transform.position + new Vector3 (0,1.2f,0) - transform.position);
+        transform.position = player.transform.position + offset + R0t * camerPositionLocal * cameraDistanceScale;
+        Q.SetLookRotation(player.transform.position + offset - transform.position);
         transform.rotation = Q;
+
+        RaycastHit hit;
+        if (Physics.Raycast(player.transform.position + offset, transform.position - player.transform.position - offset, out hit, (transform.position - player.transform.position).magnitude))
+        {
+            if (hit.collider.CompareTag("walls"))
+            {
+                transform.position = Vector3.Lerp (hit.point, player.transform.position + offset, 0.1f);
+            }
+        }
+
         //transform.rotation = R0t * Rscript * initCameraRotation;
     }
 }
