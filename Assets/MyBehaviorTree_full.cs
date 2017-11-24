@@ -26,6 +26,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public GameObject Zombie3;
     public bool keyGot = false;
 
+
     //Text boolean variables
     public bool Task = false;
     public bool Passwords = false;
@@ -48,6 +49,10 @@ public class MyBehaviorTree_full : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //KeepData.keepLevelName = SceneManager.GetActiveScene().name;
+        //DontDestroyOnLoad(King);
+        //DontDestroyOnLoad(Hero);
+
         behaviorAgent = new BehaviorAgent(this.BuildTreeRoot());
         BehaviorManager.Instance.Register(behaviorAgent);
         behaviorAgent.StartBehavior();
@@ -99,6 +104,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         }
 
     }
+
 
     public class canGotBite : Node
     {
