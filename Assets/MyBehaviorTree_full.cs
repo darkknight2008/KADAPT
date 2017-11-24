@@ -58,7 +58,8 @@ public class MyBehaviorTree_full : MonoBehaviour
         winText.text = "";
         assignText.text = "";
         dyingText.text = "";
-	D = door.GetComponent<DoorHoldOn>();
+        D = door.GetComponent<DoorHoldOn>();
+        Hero.GetComponent<PlayerController2>().enabled = true;
     }
 
     // Update is called once per frame
@@ -254,24 +255,6 @@ public class MyBehaviorTree_full : MonoBehaviour
         return new nowSwitchDoor(door);
     }
 
-    //public class isHE : Node
-    //{
-    //    protected Text winText;
-    //    public isHE(Text winText)
-    //    {
-    //        this.winText = winText;
-    //    }
-    //    public override IEnumerable<RunStatus> Execute()
-    //    {
-    //        winText.end = true;
-    //        yield return RunStatus.Success;
-    //    }
-    //}
-    //protected Node HE(Text winText)
-    //{
-    //    return new isHE(winText);
-    //}
-
     protected Node BuildTreeRoot()
     {
         Node zombie1wander = new Sequence
@@ -432,7 +415,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         Animator king_ani = King.GetComponent<Animator>();
         Animator hero_ani = Hero.GetComponent<Animator>();
-        return new Sequence(this.Greeting(king_ani), this.Bowing(hero_ani), this.Talking(king_ani), this.Kneeldown(hero_ani));
+        return new Sequence(this.Greeting(king_ani), this.Bowing(hero_ani), this.Talking(king_ani), this.Kneeldown(hero_ani), new LeafAssert(()=> this.HeroBack()));
     }
     protected Node Greeting(Animator chr)
     {
@@ -442,14 +425,13 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool Greet(Animator m_Animator)
 
     {
-        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("H_Wave");
+        Hero.GetComponent<PlayerController2>().enabled = false;
         return true;
     }
     public bool StopWorking(Animator m_Animator)
 
     {
-        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("Idle");
         if (m_Animator == Hero.GetComponent<Animator>())
         {
@@ -476,7 +458,6 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool Talk(Animator m_Animator)
 
     {
-        // AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0); ;
         m_Animator.SetTrigger("talk_tasks");
         return true;
     }
@@ -514,6 +495,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool Hero_stop(Animator hero)
     {
         hero.SetTrigger("Idle");
+        Hero.GetComponent<PlayerController2>().enabled = false;
         return true;
     }
     protected Node Biting(GameObject Zombie, GameObject Hero)
@@ -534,8 +516,6 @@ public class MyBehaviorTree_full : MonoBehaviour
             reach = Val.V(() => reach_posi3);
             return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
         }
-        //reach = Val.V(() => reach_posi1);
-        //return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
     }
     protected Node turn_move(GameObject Zombie, Val<Vector3> reach)
     {
@@ -585,23 +565,28 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool saluting(Animator chr)
     {
         chr.SetTrigger("Salute");
+        Hero.GetComponent<PlayerController2>().enabled = false;
         return true;
     }
     protected Node Tell(GameObject Hero, GameObject Dying)
     {
         Animator hero_ani = Hero.GetComponent<Animator>();
         Animator dying_ani = Dying.GetComponent<Animator>();
-        return new Sequence(new LeafWait(2000), new LeafAssert(() => this.Telling_secret(dying_ani)), new LeafWait(8000), new LeafAssert(() => this.StopWorking(hero_ani)), new LeafWait(1500));
+        return new Sequence(new LeafWait(2000), new LeafAssert(() => this.Telling_secret(dying_ani)), new LeafWait(8000), new LeafAssert(() => this.StopWorking(hero_ani)), new LeafWait(1500),new LeafAssert(()=> this.HeroBack()));
 
     }
     public bool Telling_secret(Animator dying_ani)
     {
         dying_ani.SetTrigger("Tell_secret");
         Passwords = true;
-	keyGot = true;
+        keyGot = true;
         return true;
     }
-
+    public bool HeroBack()
+    {
+        Hero.GetComponent<PlayerController2>().enabled = true;
+        return true;
+    }
     //Random walk
     protected Node Randomwalk(GameObject people, Transform center, float radius, int waitingTime)
     {
