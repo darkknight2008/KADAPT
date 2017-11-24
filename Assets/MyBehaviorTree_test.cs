@@ -10,14 +10,12 @@ public class MyBehaviorTree_test : MonoBehaviour
     public GameObject King, Hero, Dying, Zombie;
     public Transform wander1, wander2, wander3, wander4;
     public bool Task = false;
-    //public bool Accept = false;
     public bool Passwords = false;
-    //public bool Disappear = false;
     public bool Failure = false;
     public bool Success = true;
     private Vector3 reach_posi;
 
-    public Text falseText;
+    public Text failtext;
     public Text winText;
     public Text assignText;
     public Text dyingText;
@@ -32,7 +30,7 @@ public class MyBehaviorTree_test : MonoBehaviour
         behaviorAgent = new BehaviorAgent(this.BuildTreeRoot());
         BehaviorManager.Instance.Register(behaviorAgent);
         behaviorAgent.StartBehavior();
-        falseText.text = "";
+        failtext.text = "";
         winText.text = "";
         assignText.text = "";
         dyingText.text = "";
@@ -45,17 +43,13 @@ public class MyBehaviorTree_test : MonoBehaviour
         Vector3 zombie_posi = Zombie.GetComponent<Transform>().position;
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         reach_posi = 0.20f * hero_posi + 0.80f * zombie_posi;
-        //if (Passwords)
-        //{
-        //    //make door open and show the lines
-        //}
         if (Success == true)
         {
             winText.text = "Congratulations!";
         }
         if (Failure == true)
         {
-            falseText.text = "OOPS, Zombie killed you!";
+            failtext.text = "OOPS, Zombie killed you!";
         }
         if (Task == true)
         {
@@ -66,11 +60,6 @@ public class MyBehaviorTree_test : MonoBehaviour
             PositionTransKing(assignText);
             assignText.text = "";
         }
-        //if (Accept == true)
-        //{
-        //    PositionTransKing(assignText);
-        //    assignText.text = "";
-        //}
         if (Passwords == true)
         {
             PositionTransDead(dyingText);
@@ -81,11 +70,6 @@ public class MyBehaviorTree_test : MonoBehaviour
             PositionTransDead(dyingText);
             dyingText.text = "";
         }
-        //if (Disappear == true)
-        //{
-        //    PositionTransDead(dyingText);
-        //    dyingText.text = "";
-        //}
     }
 
     public void PositionTransKing(Text assignText)
@@ -109,8 +93,11 @@ public class MyBehaviorTree_test : MonoBehaviour
         //Node roaming =new DecoratorLoop( new SequenceParallel(new Sequence(this.wander(ChrA, wander1, wander2),new LeafWait(6000)),new Sequence(this.move(ChrB, meetC),this.sayHi(ChrB,ChrC), this.move(ChrB, fetchBall))));
         //Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
         //new SequenceParallel(new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>())),new LeafWait(70000))this.wander(Hero, wander1, wander2)
-        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(new LeafWait(2000), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
         //Node roaming = new DecoratorLoop(new Sequence(this.wander(Hero, wander1, wander2), this.Salute(Hero, Dying), this.Tell(Hero,Dying)));
+
+        //Three animations
+        //Node roaming = new DecoratorLoop(new Sequence(this.Assign_task(King, Hero), new LeafAssert(()=> this.StopWorking(Hero.GetComponent<Animator>()))));
+        //Node roaming = new DecoratorLoop(new Sequence(new SequenceParallel(new LeafWait(2000), this.wander(Zombie, wander3, wander4)), this.Bite(Zombie, Hero), new LeafWait(1000),new LeafAssert(()=> this.GameOver())));
         Node roaming = new DecoratorLoop(new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying)));
         return roaming;
     }
