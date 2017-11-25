@@ -26,6 +26,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public GameObject Zombie3;
     public bool keyGot = false;
 
+
     //Text boolean variables
     public bool Task = false;
     public bool Passwords = false;
@@ -38,6 +39,8 @@ public class MyBehaviorTree_full : MonoBehaviour
     public Text assignText;
     public Text dyingText;
     public Camera cam;
+    Animator anim;
+    public DoorHoldOn D;
 
     private Vector3 reach_posi;
     private Vector3 reach_posi1;
@@ -51,12 +54,13 @@ public class MyBehaviorTree_full : MonoBehaviour
         behaviorAgent = new BehaviorAgent(this.BuildTreeRoot());
         BehaviorManager.Instance.Register(behaviorAgent);
         behaviorAgent.StartBehavior();
-
+        anim = GetComponent<Animator>();
         //text
         failtext.text = "";
         winText.text = "";
         assignText.text = "";
         dyingText.text = "";
+        D = door.GetComponent<DoorHoldOn>();
     }
 
     // Update is called once per frame
@@ -97,7 +101,10 @@ public class MyBehaviorTree_full : MonoBehaviour
             PositionTransDead(dyingText);
             dyingText.text = "";
         }
-
+        if (keyGot==true)
+        {
+            D.key_get = true;
+        }
     }
 
     public class canGotBite : Node
@@ -198,7 +205,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, door.transform.position) < 2 && keyGot == true)
+                if (Vector3.Distance(Hero.transform.position, door.transform.position) <3  && keyGot == true)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -240,7 +247,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            //door.key_got = true;
+           
             yield return RunStatus.Success;
         }
     }
@@ -593,6 +600,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         dying_ani.SetTrigger("Tell_secret");
         Passwords = true;
+        keyGot = true;
         return true;
     }
 

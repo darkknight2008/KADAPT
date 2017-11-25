@@ -355,8 +355,8 @@ public class MyBehaviorTree_auto : MonoBehaviour
                 new LeafAssert(() => this.HE())
             );
         Node peoplemove = new Sequence
-            (
-                this.moveTo(Hero, wander2),
+            (   
+                this.moveTo(Hero,wander2),
                 new LeafWait(1000000)
             );
 
