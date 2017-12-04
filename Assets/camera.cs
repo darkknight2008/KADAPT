@@ -42,7 +42,7 @@ public class camera : MonoBehaviour
     {
         cameraDistanceScale += - Input.GetAxis("Mouse ScrollWheel")* Time.deltaTime * scaleSpeed;
 
-        cameraDistanceScale = Mathf.Max(0.5f, Mathf.Min(1.5f, cameraDistanceScale));
+        cameraDistanceScale = Mathf.Max(0.5f, Mathf.Min(10.0f, cameraDistanceScale));
 
         if (Input.GetButton("Fire1"))
         {
