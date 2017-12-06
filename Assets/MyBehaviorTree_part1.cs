@@ -10,7 +10,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 {
 	public GameObject Hero;
     public GameObject Chief;
-    public GameObject Oldlady;
+    public GameObject Oldman;
 	public GameObject Villager1;
     public GameObject Villager2;
     public GameObject Villager3;
@@ -20,8 +20,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
     private BehaviorAgent behaviorAgent;
 
-    private Val<Vector3> reach_oldlady;
-    private Val<Vector3> reach_chief;
+    private Vector3 reach_oldman;
+    private Vector3 reach_chief;
 
     // Use this for initialization
     void Start()
@@ -36,28 +36,29 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     void Update ()
 	{
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
-        Vector3 oldlady_posi = Oldlady.GetComponent<Transform>().position;
+        Vector3 oldman_posi = Oldman.GetComponent<Transform>().position;
         Vector3 chief_posi = Chief.GetComponent<Transform>().position;
-        reach_oldlady = Val.V(() => (0.20f * oldlady_posi + 0.80f * hero_posi)) ;
-        reach_chief = Val.V(() => (0.20f * chief_posi + 0.80f * hero_posi));
+        reach_oldman = 0.50f * oldman_posi + 0.50f * hero_posi;
+        reach_chief = 0.20f * chief_posi + 0.80f * hero_posi;
 
     }
     public class canHeroask: Node
     {
         protected GameObject Hero;
-        protected GameObject Oldlady;
-        public canHeroask(GameObject Hero, GameObject Oldlady)
+        protected GameObject Oldman;
+        public canHeroask(GameObject Hero, GameObject Oldman)
         {
             this.Hero = Hero;
-            this.Oldlady = Oldlady;
+            this.Oldman = Oldman;
         }
         public override IEnumerable<RunStatus> Execute()
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, Oldlady.transform.position) < 6)
+                if (Vector3.Distance(Hero.transform.position, Oldman.transform.position) < 5)
                 {
                     yield return RunStatus.Success;
+                    //Hero.GetComponent<PlayerController2>().enabled = false;
                     yield break;
                 }
                 else
@@ -65,14 +66,14 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             }
         }
     }
-    protected Node canask(GameObject Hero,GameObject Oldlady)
+    protected Node canask(GameObject Hero,GameObject Oldman)
     {
-        return new canHeroask(Hero,Oldlady);
+        return new canHeroask(Hero,Oldman);
     }
     public class waving : Node
     {
         protected GameObject Hero;
-        protected GameObject Oldlady;
+        //protected GameObject Oldman;
         public waving(GameObject Hero)
         {
             this.Hero = Hero;
@@ -80,59 +81,84 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         public override IEnumerable<RunStatus> Execute()
         {
             Animator hero = Hero.GetComponent<Animator>();
-            hero.SetTrigger("H_wave");//waving
+            hero.SetTrigger("H_Wave");//waving
             //text?
             yield return RunStatus.Success;
 
         }
     }
-    protected Node askdire(GameObject Hero, GameObject Oldlady, Val<Vector3> reach_oldlady)
+    //public bool waving(GameObject Hero)
+    //{
+    //    Animator hero = Hero.GetComponent<Animator>();
+    //    hero.SetTrigger("H_Wave");//waving
+    //    return true;
+    //}
+    public class back2idle : Node
     {
+        protected GameObject Chrc;
+        public back2idle(GameObject Chrc)
+        {
+            this.Chrc = Chrc;
+        }
+        public override IEnumerable<RunStatus> Execute()
+        {
+            Animator chrc = Chrc.GetComponent<Animator>();
+            chrc.SetTrigger("Idle");//Idle
+            //Chrc.GetComponent<PlayerController2>().enabled = true;
+            yield return RunStatus.Success;
 
+        }
+    }
+    protected Node askdire(GameObject Hero, GameObject Oldman, Vector3 reach_oldman)
+    {
+        Val<Vector3> reach = Val.V(() => reach_oldman);
         return new Sequence(
-            Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_oldlady), 
-            new LeafWait(100),
+            //Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach), 
+            //new LeafWait(100),
             new waving(Hero),
-            new LeafWait(1000)
+            //new LeafWait(100),
+            new back2idle(Hero),
+            new LeafWait(100)
             );
     }
     public class turnreverse : Node
     {
-        protected GameObject Oldlady;
-        public turnreverse(GameObject Oldlady)
+        protected GameObject Oldman;
+        public turnreverse(GameObject Oldman)
         {
-            this.Oldlady = Oldlady;
+            this.Oldman = Oldman;
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            Animator oldlady = Oldlady.GetComponent<Animator>();
-            oldlady.SetTrigger("turn_village");//turn 180 degrees
+            Animator oldman = Oldman.GetComponent<Animator>();
+            oldman.SetTrigger("turn_village");//turn 180 degrees
             yield return RunStatus.Success;
 
         }
     }
     public class pointingup : Node
     {
-        protected GameObject Oldlady;
-        public pointingup(GameObject Oldlady)
+        protected GameObject Oldman;
+        public pointingup(GameObject Oldman)
         {
-            this.Oldlady = Oldlady;
+            this.Oldman = Oldman;
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            Animator oldlady = Oldlady.GetComponent<Animator>();
-            oldlady.SetTrigger("H_LookUp");//LookUp
+            Animator oldman = Oldman.GetComponent<Animator>();
+            oldman.SetTrigger("H_LookUp");//LookUp
             yield return RunStatus.Success;
     }
     }
-    protected Node pointdire(GameObject Oldlady)
+    protected Node pointdire(GameObject Oldman)
     {
 
         return new Sequence(
-            new turnreverse(Oldlady),
+            new turnreverse(Oldman),
+            new LeafWait(3000),
+            new pointingup(Oldman),
             new LeafWait(1000),
-            new pointingup(Oldlady),
-            new LeafWait(1000)
+            new back2idle(Oldman)
             );
     }
 
@@ -181,10 +207,11 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     protected Node intro2self(GameObject Hero,Val<Vector3> reach_chief)
     {
         return new Sequence(
-            Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
-            new LeafWait(100),
+           // Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
+           // new LeafWait(100),
             new bowing(Hero),
-            new LeafWait(1000)
+            new LeafWait(1000),
+            new back2idle(Hero)
             );
     }
     public class requesting_down : Node
@@ -259,8 +286,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         return new SequenceParallel(
             new bargaining(Villager1),
             new Sequence(
-                new LeafWait(1000),
-                new thinking(Villager2))
+                new LeafWait(3000),
+                new thinking(Villager2)),
+            new LeafWait(8000)
             );
     }
     public class quarrel_ind: Node
@@ -295,7 +323,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     {
         return new SequenceParallel(
             new quarrel_ind(Villager3),
-            new cry_ind(Villager4)
+            new cry_ind(Villager4),
+            new LeafWait(8000)
             );
     }
 
@@ -332,18 +361,19 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         return new SequenceParallel(
            new chat_ld(Villager5),
            new Sequence(
-               new LeafWait(1500),
-               new chat_qt(Villager6))
+               new LeafWait(3000),
+               new chat_qt(Villager6)),
+           new LeafWait(8000)
             );
     }
     protected Node BuildTreeRoot()
     {
         Node AskDire = new Sequence(
             new SuccessLoop(
-                this.canask(Hero, Oldlady)
+                this.canask(Hero, Oldman)
                 ),
-            this.askdire(Hero,Oldlady, reach_oldlady),
-            this.pointdire(Oldlady)
+            this.askdire(Hero,Oldman, reach_oldman),
+            this.pointdire(Oldman)
             );
         Node Chiefstask = new Sequence(
             new SuccessLoop(
@@ -364,7 +394,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         Node root = new DecoratorLoop(new Sequence
         //Node root = new Sequence
             (
-                AskDire,
+                //AskDire,
                 new SelectorParallel
                 (
                     new Sequence(
@@ -374,8 +404,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
                     Shop,//loop
                     Quarrel,//loop
                     Chat //loop
-                )
-                //new LeafWait(100000000000)
+                ),
+                new LeafWait(100000000000)
             )
             );
         return root;
