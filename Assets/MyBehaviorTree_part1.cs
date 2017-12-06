@@ -65,7 +65,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
                 {
                     yield return RunStatus.Success;
                     //Hero.GetComponent<PlayerController2>().enabled = false;
-                    UnityEngine.Debug.Log("turn");
+                    //UnityEngine.Debug.Log("turn");
                     yield break;
                 }
                 else
@@ -211,7 +211,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
            // Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
            // new LeafWait(100),
             new bowing(Hero),
-            new LeafWait(700),
+            new LeafWait(500),
             new back2idle(Hero),
             new LeafWait(3000)
             );
@@ -396,7 +396,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         //Node root = new DecoratorLoop(new Sequence
         Node root = new Sequence
             (
-                //AskDire,
+                AskDire,
                 new SelectorParallel
                 (
                     new Sequence(
@@ -406,8 +406,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
                     Shop,//loop
                     Quarrel,//loop
                     Chat //loop
-                ),
-                new LeafWait(100000000000)
+                )
+                //new LeafWait(100000000000)
            // )
             );
         return root;
