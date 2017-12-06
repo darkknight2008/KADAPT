@@ -22,6 +22,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
     private Vector3 reach_oldman;
     private Vector3 reach_chief;
+    private float dist_oldman;
+    private float dist_chief;
 
     // Use this for initialization
     void Start()
@@ -41,6 +43,10 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         reach_oldman = 0.50f * oldman_posi + 0.50f * hero_posi;
         reach_chief = 0.20f * chief_posi + 0.80f * hero_posi;
 
+        float dist_oldman = Vector3.Distance(Hero.transform.position, Oldman.transform.position);
+        float dist_chief = Vector3.Distance(Hero.transform.position, Chief.transform.position);
+
+
     }
     public class canHeroask: Node
     {
@@ -55,10 +61,11 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, Oldman.transform.position) < 5)
+                if (Vector3.Distance(Hero.transform.position, Oldman.transform.position) < 6)
                 {
                     yield return RunStatus.Success;
                     //Hero.GetComponent<PlayerController2>().enabled = false;
+                    UnityEngine.Debug.Log("turn");
                     yield break;
                 }
                 else
@@ -87,12 +94,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
         }
     }
-    //public bool waving(GameObject Hero)
-    //{
-    //    Animator hero = Hero.GetComponent<Animator>();
-    //    hero.SetTrigger("H_Wave");//waving
-    //    return true;
-    //}
     public class back2idle : Node
     {
         protected GameObject Chrc;
@@ -116,9 +117,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             //Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach), 
             //new LeafWait(100),
             new waving(Hero),
-            //new LeafWait(100),
+            new LeafWait(500),
             new back2idle(Hero),
-            new LeafWait(100)
+            new LeafWait(3000)
             );
     }
     public class turnreverse : Node
@@ -155,7 +156,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
         return new Sequence(
             new turnreverse(Oldman),
-            new LeafWait(3000),
+            new LeafWait(700),
             new pointingup(Oldman),
             new LeafWait(1000),
             new back2idle(Oldman)
@@ -210,8 +211,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
            // Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
            // new LeafWait(100),
             new bowing(Hero),
-            new LeafWait(1000),
-            new back2idle(Hero)
+            new LeafWait(700),
+            new back2idle(Hero),
+            new LeafWait(3000)
             );
     }
     public class requesting_down : Node
@@ -324,7 +326,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         return new SequenceParallel(
             new quarrel_ind(Villager3),
             new cry_ind(Villager4),
-            new LeafWait(8000)
+            new LeafWait(7000)
             );
     }
 
@@ -391,8 +393,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         Node Chat = new DecoratorLoop(
             this.chatting(Villager5,Villager6)
             );
-        Node root = new DecoratorLoop(new Sequence
-        //Node root = new Sequence
+        //Node root = new DecoratorLoop(new Sequence
+        Node root = new Sequence
             (
                 //AskDire,
                 new SelectorParallel
@@ -406,7 +408,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
                     Chat //loop
                 ),
                 new LeafWait(100000000000)
-            )
+           // )
             );
         return root;
     }
