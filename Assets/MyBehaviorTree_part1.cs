@@ -37,7 +37,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public Text task_text;
 
     //camera
-    public camera cam;
+    public Camera cam;
 
     // Use this for initialization
     void Start()

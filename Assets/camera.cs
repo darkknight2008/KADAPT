@@ -95,8 +95,4 @@ public class camera : MonoBehaviour
         //transform.rotation = R0t * Rscript * initCameraRotation;
     }
 
-    internal Vector2 WorldToScreenPoint(Vector3 worldPosition)
-    {
-        throw new NotImplementedException();
-    }
 }
