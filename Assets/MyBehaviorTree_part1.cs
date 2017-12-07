@@ -129,15 +129,17 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public class turnreverse : Node
     {
         protected GameObject Oldman;
-        public turnreverse(GameObject Oldman)
+        protected bool text;
+        public turnreverse(GameObject Oldman,bool text)
         {
             this.Oldman = Oldman;
+            this.text = text;
         }
         public override IEnumerable<RunStatus> Execute()
         {
             Animator oldman = Oldman.GetComponent<Animator>();
             oldman.SetTrigger("turn_village");//turn 180 degrees
-            direction = true;
+            text = true;
             yield return RunStatus.Success;
 
         }
@@ -160,7 +162,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     {
 
         return new Sequence(
-            new turnreverse(Oldman),
+            new turnreverse(Oldman,direction),
             new LeafWait(700),
             new pointingup(Oldman),
             new LeafWait(1000),
@@ -224,15 +226,17 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public class requesting_down : Node
     {
         protected GameObject Chief;
-        public requesting_down(GameObject Chief)
+        protected bool text;
+        public requesting_down(GameObject Chief,bool text)
         {
             this.Chief = Chief;
+            this.text = text;
         }
         public override IEnumerable<RunStatus> Execute()
         {
             Animator chief = Chief.GetComponent<Animator>();
             chief.SetTrigger("Request_down");//empty now
-            task = true;//text
+            text = true;//text
             yield return RunStatus.Success;
         }
     }
@@ -254,7 +258,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     protected Node request(GameObject Chief)
     {
         return new Sequence(
-            new requesting_down(Chief),
+            new requesting_down(Chief,task),
             new LeafWait(4000),
             new requesting_up(Chief),
             new LeafWait(4000)
