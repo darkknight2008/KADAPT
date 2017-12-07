@@ -36,7 +36,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     public bool Success = false;
 
     //Text
-    public Text winText;
+    //public Text winText;
     public Text failtext;
     public Text dyingText;
     public Camera cam;
@@ -62,7 +62,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
 
         //text
         failtext.text = "";
-        winText.text = "";
+        //winText.text = "";
         //assignText.text = "";
         dyingText.text = "";
         D = door.GetComponent<DoorHoldOn>();
@@ -89,10 +89,10 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         reach_posi6 = 0.20f * hero_posi + 0.80f * zombie6_posi;
         reach_posi7 = 0.20f * hero_posi + 0.80f * zombie7_posi;
 
-        if (Success == true)
-        {
-            winText.text = "Congratulations!";
-        }
+        //if (Success == true)
+        //{
+        //    winText.text = "Congratulations!";
+        //}
         if (Failure == true)
         {
             failtext.text = "OOPS, Zombie killed you!";
@@ -272,7 +272,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie1, this.wander1, 3.0f, 1000)
+                            this.Randomwalk(Zombie1, this.wander1, 1.0f, 1000)
                         ),
                         this.canBite(Zombie1, Hero)
                     )
@@ -288,7 +288,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie2, this.wander2, 3.0f, 1000)
+                            this.Randomwalk(Zombie2, this.wander2, 1.0f, 1000)
                         ),
                         this.canBite(Zombie2, Hero)
                     )
@@ -304,7 +304,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie3, this.wander3, 3.0f, 1000)
+                            this.Randomwalk(Zombie3, this.wander3, 1.0f, 1000)
 
                         ),
                         this.canBite(Zombie3, Hero)
@@ -321,7 +321,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie4, this.wander4, 3.0f, 1000)
+                            this.Randomwalk(Zombie4, this.wander4, 1.0f, 1000)
 
                         ),
                         this.canBite(Zombie4, Hero)
@@ -338,7 +338,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie5, this.wander5, 3.0f, 1000)
+                            this.Randomwalk(Zombie5, this.wander5, 1.0f, 1000)
 
                         ),
                         this.canBite(Zombie5, Hero)
@@ -355,7 +355,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie6, this.wander6, 3.0f, 1000)
+                            this.Randomwalk(Zombie6, this.wander6, 1.0f, 1000)
 
                         ),
                         this.canBite(Zombie6, Hero)
@@ -372,7 +372,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                     (
                         new DecoratorLoop
                         (
-                            this.Randomwalk(Zombie7, this.wander7, 3.0f, 1000)
+                            this.Randomwalk(Zombie7, this.wander7, 1.0f, 1000)
 
                         ),
                         this.canBite(Zombie7, Hero)
@@ -406,7 +406,8 @@ public class MyBehaviorTree_part2 : MonoBehaviour
                 (
                     this.getSword(Hero, sword)
                 ),
-                new LeafAssert(()=> this.HE())
+                //new LeafAssert(()=> this.HE())
+                new LeafWait(100)
             );
 
         //Node root = new DecoratorLoop( new Sequence
@@ -461,18 +462,24 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     //Zombie bites
     protected Node ZombieBite(GameObject Zombie, GameObject Hero)
     {
-        return new Sequence(this.Bite(Zombie, Hero), new LeafWait(1000), new LeafAssert(() => this.GameOver()));
+        return new Sequence(
+            this.Bite(Zombie, Hero), 
+            new LeafWait(1000), 
+            new LeafAssert(() => this.GameOver()));
     }
     protected Node Bite(GameObject Zombie, GameObject Hero)
     {
         Animator hero_ani = Hero.GetComponent<Animator>();
         Animator zombie_ani = Zombie.GetComponent<Animator>();
-        return new Sequence(new LeafAssert(() => this.Hero_stop(hero_ani)), this.Biting(Zombie, Hero), new LeafWait(200), this.HeroDies(hero_ani));
+        return new Sequence(
+            new LeafAssert(() => this.Hero_stop(hero_ani)), 
+            this.Biting(Zombie, Hero),
+            new LeafWait(200), this.HeroDies(hero_ani));
     }
     public bool Hero_stop(Animator hero)
     {
         hero.SetTrigger("Idle");
-        Hero.GetComponent<PlayerController2>().enabled = false;
+        //Hero.GetComponent<PlayerController2>().enabled = false;
         return true;
     }
     protected Node Biting(GameObject Zombie, GameObject Hero)
@@ -482,36 +489,57 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         if (Zombie == Zombie1)
         {
             reach = Val.V(() => reach_posi1);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }else if (Zombie == Zombie2)
         {
             reach = Val.V(() => reach_posi2);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
         else if(Zombie == Zombie3)
         {
             reach = Val.V(() => reach_posi3);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
         else if (Zombie == Zombie4)
         {
             reach = Val.V(() => reach_posi4);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
         else if (Zombie == Zombie5)
         {
             reach = Val.V(() => reach_posi5);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
         else if (Zombie == Zombie6)
         {
             reach = Val.V(() => reach_posi6);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
         else
         {
             reach = Val.V(() => reach_posi7);
-            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+            return new Sequence(
+                //turn_move(Zombie, reach), 
+                new LeafAssert(() => this.Bite_hero(zombie_ani))
+                );
         }
     }
     protected Node turn_move(GameObject Zombie, Val<Vector3> reach)

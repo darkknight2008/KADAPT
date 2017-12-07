@@ -18,7 +18,7 @@ public class SwordController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        isHold = true;
+        isHold = false;
         anim = holdBy.GetComponent<Animator>();
 
         kill = false;

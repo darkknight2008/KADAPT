@@ -23,8 +23,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
     private Vector3 reach_oldman;
     private Vector3 reach_chief;
-    private float dist_oldman;
-    private float dist_chief;
 
     //text control
     private bool direction=false;
@@ -58,8 +56,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         reach_oldman = 0.50f * oldman_posi + 0.50f * hero_posi;
         reach_chief = 0.20f * chief_posi + 0.80f * hero_posi;
 
-        float dist_oldman = Vector3.Distance(Hero.transform.position, Oldman.transform.position);
-        float dist_chief = Vector3.Distance(Hero.transform.position, Chief.transform.position);
 
         //text control
         if (direction == true)
@@ -107,7 +103,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
                 {
                     yield return RunStatus.Success;
                     //Hero.GetComponent<PlayerController2>().enabled = false;
-                    //UnityEngine.Debug.Log("turn");
                     yield break;
                 }
                 else
@@ -147,7 +142,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         {
             Animator chrc = Chrc.GetComponent<Animator>();
             chrc.SetTrigger("Idle");//Idle
-            //Chrc.GetComponent<PlayerController2>().enabled = true;
             yield return RunStatus.Success;
 
         }
@@ -211,7 +205,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             new turnreverse(Oldman),
             new LeafWait(700),
             new pointingup(Oldman),
-            new LeafWait(1000),
+            new LeafWait(3000),
             new back2idle(Oldman),
             new LeafAssert(() => this.closedire())
             );
@@ -314,9 +308,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         return new Sequence(
             new requesting_down(Chief, task),
             new LeafAssert(() => this.showtask()),
-            new LeafWait(4000),
+            new LeafWait(6000),
             new requesting_up(Chief),
-            new LeafWait(4000),
+            new LeafWait(6000),
             new LeafAssert(()=> this.closetask())
             );
     }
