@@ -401,20 +401,25 @@
     <Compile Include="Assets\Core\Scripts\Util\Tuple.cs" />
     <Compile Include="Assets\DoorHoldOn.cs" />
     <Compile Include="Assets\emit_ball.cs" />
+    <Compile Include="Assets\FireController.cs" />
     <Compile Include="Assets\IKtest.cs" />
     <Compile Include="Assets\MedievalTownExteriors\Scripts\ProtectCameraFromWallClip.cs" />
     <Compile Include="Assets\MyBehaviorTree.cs" />
     <Compile Include="Assets\MyBehaviorTree_auto.cs" />
     <Compile Include="Assets\MyBehaviorTree_full.cs" />
     <Compile Include="Assets\MyBehaviorTree_part1.cs" />
+    <Compile Include="Assets\MyBehaviorTree_part2.cs" />
+    <Compile Include="Assets\MyBehaviorTree_part4.cs" />
     <Compile Include="Assets\MyBehaviorTree_test.cs" />
     <Compile Include="Assets\MyBehaviorTree2.cs" />
     <Compile Include="Assets\myCamera.cs" />
     <Compile Include="Assets\NewBehaviourTree3.cs" />
     <Compile Include="Assets\PlayerController2.cs" />
     <Compile Include="Assets\ResetScene.cs" />
+    <Compile Include="Assets\SwordController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Download\Elven_Sword\ReadMe.txt" />
     <None Include="Assets\MedievalTownExteriors\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

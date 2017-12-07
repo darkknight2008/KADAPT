@@ -26,8 +26,17 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     private float dist_chief;
 
     //text control
-    private bool direction;
-    private bool task;
+    private bool direction=false;
+    private bool direction_disappear=false;
+    private bool task=false;
+    private bool task_disappear=false;
+
+    //text
+    public Text direction_text;
+    public Text task_text;
+
+    //camera
+    public camera cam;
 
     // Use this for initialization
     void Start()
@@ -35,7 +44,8 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         behaviorAgent = new BehaviorAgent(this.BuildTreeRoot());
         BehaviorManager.Instance.Register(behaviorAgent);
         behaviorAgent.StartBehavior();
-
+        direction_text.text = "";
+        task_text.text = "";
     }
 
     // Update is called once per frame
@@ -50,8 +60,35 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         float dist_oldman = Vector3.Distance(Hero.transform.position, Oldman.transform.position);
         float dist_chief = Vector3.Distance(Hero.transform.position, Chief.transform.position);
 
-
+        //text control
+        if (direction == true)
+        {
+            PositionTrans(Oldman, direction_text);
+            direction_text.text = "Finally, here you come. The evil took our mayer's young daughter, ALICE and we really need your help. Please go this way, and ask mayer for more information.";
+        }
+        if (direction_disappear == true)
+        {
+            direction_text.text = "";
+        }
+        if (task == true)
+        {
+            PositionTrans(Chief, task_text);
+            task_text.text = "Hi HERO, thanks for your coming. Our brave villager ERIC tried to rescue ALICE but we have lost him contact for several days. ALICE is all I have and please get her back.";
+        }
+        if (task_disappear == true)
+        {
+            task_text.text = "";
+        }
     }
+
+    public void PositionTrans(GameObject gb, Text assignText)
+    {
+        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z);
+        Vector2 position = cam.WorldToScreenPoint(worldPosition);
+        position = new Vector2(position.x, position.y);
+        assignText.transform.position = position;
+    }
+
     public class canHeroask: Node
     {
         protected GameObject Hero;

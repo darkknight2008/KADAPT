@@ -93,7 +93,8 @@ public class MyBehaviorTree_full : MonoBehaviour
         if (Passwords == true)
         {
             PositionTransDead(dyingText);
-            dyingText.text = "I can't go with you, go and get the sword!!!";
+            //dyingText.text = "I can't go with you, go and get the sword!!!";
+            dyingText.text = "I can't go with you, go and get the sword!!! ALICE's life is counting on you.";
         }
         else
         {

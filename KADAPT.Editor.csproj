@@ -325,6 +325,7 @@
     <Compile Include="Assets\Core\Scripts\IK\Editor\CrossfadeLookAtIKInspector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Download\Elven_Sword\ReadMe.txt" />
     <None Include="Assets\MedievalTownExteriors\Readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
