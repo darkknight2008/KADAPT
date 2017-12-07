@@ -25,6 +25,10 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     private float dist_oldman;
     private float dist_chief;
 
+    //text control
+    private bool direction;
+    private bool task;
+
     // Use this for initialization
     void Start()
     {
@@ -133,6 +137,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         {
             Animator oldman = Oldman.GetComponent<Animator>();
             oldman.SetTrigger("turn_village");//turn 180 degrees
+            direction = true;
             yield return RunStatus.Success;
 
         }
@@ -227,7 +232,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         {
             Animator chief = Chief.GetComponent<Animator>();
             chief.SetTrigger("Request_down");//empty now
-            //text?
+            task = true;//text
             yield return RunStatus.Success;
         }
     }
