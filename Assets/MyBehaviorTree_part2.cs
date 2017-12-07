@@ -31,7 +31,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     public bool keyGot = false;
 
     //Text boolean variables
-    public bool Task = false;
+    //public bool Task = false;
     public bool Passwords = false;
     public bool Failure = false;
     public bool Success = false;
@@ -39,15 +39,20 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     //Text
     public Text winText;
     public Text failtext;
-    public Text assignText;
+    //public Text assignText;
     public Text dyingText;
     public Camera cam;
-    public DoorHoldOn D;
+    private DoorHoldOn D;
 
     private Vector3 reach_posi;
     private Vector3 reach_posi1;
     private Vector3 reach_posi2;
     private Vector3 reach_posi3;
+    private Vector3 reach_posi4;
+    private Vector3 reach_posi5;
+    private Vector3 reach_posi6;
+    private Vector3 reach_posi7;
+
 
     private BehaviorAgent behaviorAgent;
     // Use this for initialization
@@ -60,7 +65,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         //text
         failtext.text = "";
         winText.text = "";
-        assignText.text = "";
+        //assignText.text = "";
         dyingText.text = "";
         D = door.GetComponent<DoorHoldOn>();
         Hero.GetComponent<PlayerController2>().enabled = true;
@@ -72,10 +77,20 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         Vector3 zombie1_posi = Zombie1.GetComponent<Transform>().position;
         Vector3 zombie2_posi = Zombie2.GetComponent<Transform>().position;
         Vector3 zombie3_posi = Zombie3.GetComponent<Transform>().position;
+        Vector3 zombie4_posi = Zombie3.GetComponent<Transform>().position;
+        Vector3 zombie5_posi = Zombie3.GetComponent<Transform>().position;
+        Vector3 zombie6_posi = Zombie3.GetComponent<Transform>().position;
+        Vector3 zombie7_posi = Zombie3.GetComponent<Transform>().position;
+
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         reach_posi1 = 0.20f * hero_posi + 0.80f * zombie1_posi;
         reach_posi2 = 0.20f * hero_posi + 0.80f * zombie2_posi;
         reach_posi3 = 0.20f * hero_posi + 0.80f * zombie3_posi;
+        reach_posi4 = 0.20f * hero_posi + 0.80f * zombie4_posi;
+        reach_posi5 = 0.20f * hero_posi + 0.80f * zombie5_posi;
+        reach_posi6 = 0.20f * hero_posi + 0.80f * zombie6_posi;
+        reach_posi7 = 0.20f * hero_posi + 0.80f * zombie7_posi;
+
         if (Success == true)
         {
             winText.text = "Congratulations!";
@@ -475,9 +490,29 @@ public class MyBehaviorTree_part2 : MonoBehaviour
             reach = Val.V(() => reach_posi2);
             return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
         }
-        else
+        else if(Zombie == Zombie3)
         {
             reach = Val.V(() => reach_posi3);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        else if (Zombie == Zombie4)
+        {
+            reach = Val.V(() => reach_posi4);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        else if (Zombie == Zombie5)
+        {
+            reach = Val.V(() => reach_posi5);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        else if (Zombie == Zombie6)
+        {
+            reach = Val.V(() => reach_posi6);
+            return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
+        }
+        else
+        {
+            reach = Val.V(() => reach_posi7);
             return new Sequence(turn_move(Zombie, reach), new LeafAssert(() => this.Bite_hero(zombie_ani)));
         }
     }
