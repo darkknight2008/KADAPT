@@ -31,7 +31,6 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     public bool keyGot = false;
 
     //Text boolean variables
-    //public bool Task = false;
     public bool Passwords = false;
     public bool Failure = false;
     public bool Success = false;
@@ -39,7 +38,6 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     //Text
     public Text winText;
     public Text failtext;
-    //public Text assignText;
     public Text dyingText;
     public Camera cam;
     private DoorHoldOn D;
@@ -102,7 +100,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         if (Passwords == true)
         {
             PositionTransDead(dyingText);
-            dyingText.text = "I can't go with you, go and get the sword!!!";
+            dyingText.text = "I can't go with you, go and get the sword!!! ALICE's life is counting on you.";
         }
         else
         {

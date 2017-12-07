@@ -17,6 +17,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public GameObject Villager4;
     public GameObject Villager5;
     public GameObject Villager6;
+    
 
     private BehaviorAgent behaviorAgent;
 
@@ -83,7 +84,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
     public void PositionTrans(GameObject gb, Text assignText)
     {
-        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z);
+        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z)+new Vector3(0, 1.5f, 0);
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         assignText.transform.position = position;
@@ -166,17 +167,14 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public class turnreverse : Node
     {
         protected GameObject Oldman;
-        protected bool text;
-        public turnreverse(GameObject Oldman,bool text)
+        public turnreverse(GameObject Oldman)
         {
             this.Oldman = Oldman;
-            this.text = text;
         }
         public override IEnumerable<RunStatus> Execute()
         {
             Animator oldman = Oldman.GetComponent<Animator>();
             oldman.SetTrigger("turn_village");//turn 180 degrees
-            text = true;
             yield return RunStatus.Success;
 
         }
@@ -195,15 +193,27 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             yield return RunStatus.Success;
     }
     }
+    public bool showdire()
+    {
+        direction = true;
+        return true;
+     }
+    public bool closedire()
+    {
+        direction_disappear = true;
+        return true;
+    }
     protected Node pointdire(GameObject Oldman)
     {
 
         return new Sequence(
-            new turnreverse(Oldman,direction),
+            new LeafAssert(() => this.showdire()),
+            new turnreverse(Oldman),
             new LeafWait(700),
             new pointingup(Oldman),
             new LeafWait(1000),
-            new back2idle(Oldman)
+            new back2idle(Oldman),
+            new LeafAssert(() => this.closedire())
             );
     }
 
@@ -263,17 +273,14 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public class requesting_down : Node
     {
         protected GameObject Chief;
-        protected bool text;
         public requesting_down(GameObject Chief,bool text)
         {
             this.Chief = Chief;
-            this.text = text;
         }
         public override IEnumerable<RunStatus> Execute()
         {
             Animator chief = Chief.GetComponent<Animator>();
             chief.SetTrigger("Request_down");//empty now
-            text = true;//text
             yield return RunStatus.Success;
         }
     }
@@ -292,13 +299,25 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             yield return RunStatus.Success;
         }
     }
+    public bool showtask()
+    {
+        task = true;
+        return true;
+    }
+    public bool closetask()
+    {
+        task_disappear = true;
+        return true;
+    }
     protected Node request(GameObject Chief)
     {
         return new Sequence(
-            new requesting_down(Chief,task),
+            new requesting_down(Chief, task),
+            new LeafAssert(() => this.showtask()),
             new LeafWait(4000),
             new requesting_up(Chief),
-            new LeafWait(4000)
+            new LeafWait(4000),
+            new LeafAssert(()=> this.closetask())
             );
     }
     public class bargaining : Node
