@@ -65,7 +65,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         if (direction == true)
         {
             PositionTrans(Oldman, direction_text);
-            direction_text.text = "Finally, here you come. The evil took our mayer's young daughter, ALICE and we really need your help. Please go this way, and ask mayer for more information.";
+            direction_text.text = "Finally, here you come. The evil took our mayor's young daughter, ALICE and we really need your help. Please go this way, and ask mayor for more information.";
         }
         if (direction_disappear == true)
         {
