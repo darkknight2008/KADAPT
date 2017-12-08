@@ -47,6 +47,8 @@ public class PlayerController2 : MonoBehaviour
             transform.rotation = Quaternion.Euler(new Vector3(0.0f, angleVelocity * Time.deltaTime, 0.0f)) * transform.rotation;
 
             anim.SetFloat("Speed", velocity);
+            //anim.SetFloat("Direction", Mathf.Sign(angleVelocity));
+            anim.SetFloat("AngularSpeed", 0.5f * angleVelocity);
             //anim.SetFloat("Direction", velocity);
         }
     }
