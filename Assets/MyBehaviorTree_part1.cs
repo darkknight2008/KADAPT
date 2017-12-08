@@ -53,7 +53,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         Vector3 oldman_posi = Oldman.GetComponent<Transform>().position;
         Vector3 chief_posi = Chief.GetComponent<Transform>().position;
-        reach_oldman = 0.50f * oldman_posi + 0.50f * hero_posi;
+        reach_oldman = 0.20f * oldman_posi + 0.80f * hero_posi;
         reach_chief = 0.20f * chief_posi + 0.80f * hero_posi;
 
 
@@ -101,8 +101,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             {
                 if (Vector3.Distance(Hero.transform.position, Oldman.transform.position) < 6)
                 {
+                    Hero.GetComponent<PlayerController2>().enabled = false;
+                    //Hero.GetComponent<CharacterController>().enabled = true;
                     yield return RunStatus.Success;
-                    //Hero.GetComponent<PlayerController2>().enabled = false;
                     yield break;
                 }
                 else
@@ -117,7 +118,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     public class waving : Node
     {
         protected GameObject Hero;
-        //protected GameObject Oldman;
         public waving(GameObject Hero)
         {
             this.Hero = Hero;
@@ -146,6 +146,20 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
         }
     }
+    public class back2live : Node
+    {
+        protected GameObject Chrc;
+        public back2live(GameObject Chrc)
+        {
+            this.Chrc = Chrc;
+        }
+        public override IEnumerable<RunStatus> Execute()
+        {
+            Chrc.GetComponent<PlayerController2>().enabled = true;
+            yield return RunStatus.Success;
+
+        }
+    }
     protected Node askdire(GameObject Hero, GameObject Oldman, Vector3 reach_oldman)
     {
         Val<Vector3> reach = Val.V(() => reach_oldman);
@@ -153,9 +167,10 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             //Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach), 
             //new LeafWait(100),
             new waving(Hero),
-            new LeafWait(500),
+            new LeafWait(1000),
             new back2idle(Hero),
-            new LeafWait(3000)
+            new LeafWait(3000),
+            new back2live(Hero)
             );
     }
     public class turnreverse : Node
@@ -226,6 +241,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             {
                 if (Vector3.Distance(Hero.transform.position, Chief.transform.position) < 6)
                 {
+                    Hero.GetComponent<PlayerController2>().enabled = false;
                     yield return RunStatus.Success;
                     yield break;
                 }
@@ -259,9 +275,10 @@ public class MyBehaviorTree_part1 : MonoBehaviour
            // Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
            // new LeafWait(100),
             new bowing(Hero),
-            new LeafWait(500),
+            //new LeafWait(500),
             new back2idle(Hero),
-            new LeafWait(3000)
+            new LeafWait(3000),
+            new back2live(Hero)
             );
     }
     public class requesting_down : Node
@@ -289,7 +306,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         {
             Animator chief = Chief.GetComponent<Animator>();
             chief.SetTrigger("Request_up");
-            //text?
             yield return RunStatus.Success;
         }
     }
@@ -308,7 +324,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         return new Sequence(
             new requesting_down(Chief, task),
             new LeafAssert(() => this.showtask()),
-            new LeafWait(6000),
+            new LeafWait(4000),
             new requesting_up(Chief),
             new LeafWait(6000),
             new LeafAssert(()=> this.closetask())

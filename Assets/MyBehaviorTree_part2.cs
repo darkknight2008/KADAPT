@@ -62,8 +62,6 @@ public class MyBehaviorTree_part2 : MonoBehaviour
 
         //text
         failtext.text = "";
-        //winText.text = "";
-        //assignText.text = "";
         dyingText.text = "";
         D = door.GetComponent<DoorHoldOn>();
         Hero.GetComponent<PlayerController2>().enabled = true;
@@ -75,11 +73,10 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         Vector3 zombie1_posi = Zombie1.GetComponent<Transform>().position;
         Vector3 zombie2_posi = Zombie2.GetComponent<Transform>().position;
         Vector3 zombie3_posi = Zombie3.GetComponent<Transform>().position;
-        Vector3 zombie4_posi = Zombie3.GetComponent<Transform>().position;
-        Vector3 zombie5_posi = Zombie3.GetComponent<Transform>().position;
-        Vector3 zombie6_posi = Zombie3.GetComponent<Transform>().position;
-        Vector3 zombie7_posi = Zombie3.GetComponent<Transform>().position;
-
+        Vector3 zombie4_posi = Zombie4.GetComponent<Transform>().position;
+        Vector3 zombie5_posi = Zombie5.GetComponent<Transform>().position;
+        Vector3 zombie6_posi = Zombie6.GetComponent<Transform>().position;
+        Vector3 zombie7_posi = Zombie7.GetComponent<Transform>().position;
         Vector3 hero_posi = Hero.GetComponent<Transform>().position;
         reach_posi1 = 0.20f * hero_posi + 0.80f * zombie1_posi;
         reach_posi2 = 0.20f * hero_posi + 0.80f * zombie2_posi;
@@ -89,10 +86,6 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         reach_posi6 = 0.20f * hero_posi + 0.80f * zombie6_posi;
         reach_posi7 = 0.20f * hero_posi + 0.80f * zombie7_posi;
 
-        //if (Success == true)
-        //{
-        //    winText.text = "Congratulations!";
-        //}
         if (Failure == true)
         {
             failtext.text = "OOPS, Zombie killed you!";
@@ -479,7 +472,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     public bool Hero_stop(Animator hero)
     {
         hero.SetTrigger("Idle");
-        //Hero.GetComponent<PlayerController2>().enabled = false;
+        Hero.GetComponent<PlayerController2>().enabled = false;
         return true;
     }
     protected Node Biting(GameObject Zombie, GameObject Hero)
@@ -490,14 +483,14 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi1);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }else if (Zombie == Zombie2)
         {
             reach = Val.V(() => reach_posi2);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -505,7 +498,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi3);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -513,7 +506,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi4);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -521,7 +514,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi5);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -529,7 +522,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi6);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -537,7 +530,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         {
             reach = Val.V(() => reach_posi7);
             return new Sequence(
-                //turn_move(Zombie, reach), 
+                turn_move(Zombie, reach), 
                 new LeafAssert(() => this.Bite_hero(zombie_ani))
                 );
         }
@@ -579,13 +572,18 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     //Tell key
     protected Node TellKey(GameObject Hero, GameObject Dying)
     {
-        return new Sequence(this.Salute(Hero, Dying), this.Tell(Hero, Dying));
+        return new Sequence(
+            this.Salute(Hero, Dying), 
+            this.Tell(Hero, Dying));
     }
     protected Node Salute(GameObject Hero, GameObject Dying)
     {
         Animator hero_ani = Hero.GetComponent<Animator>();
         Animator dying_ani = Dying.GetComponent<Animator>();
-        return new SequenceParallel(new LeafAssert(() => this.saluting(hero_ani)), new LeafAssert(() => this.saluting(dying_ani)));
+        return new SequenceParallel(
+            new LeafAssert(() => this.saluting(hero_ani)), 
+            new LeafAssert(() => this.saluting(dying_ani))
+            );
     }
     public bool saluting(Animator chr)
     {
@@ -597,12 +595,18 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     {
         Animator hero_ani = Hero.GetComponent<Animator>();
         Animator dying_ani = Dying.GetComponent<Animator>();
-        return new Sequence(new LeafWait(2000), new LeafAssert(() => this.Telling_secret(dying_ani)), new LeafWait(8000), new LeafAssert(() => this.StopWorking(hero_ani)), new LeafWait(1500),new LeafAssert(()=> this.HeroBack()));
+        return new Sequence(
+            new LeafWait(2000), 
+            new LeafAssert(() => this.Telling_secret(dying_ani)), 
+            new LeafWait(8000), 
+            new LeafAssert(() => this.StopWorking(hero_ani)), 
+            new LeafWait(1500),
+            new LeafAssert(()=> this.HeroBack()));
 
     }
     public bool Telling_secret(Animator dying_ani)
     {
-        dying_ani.SetTrigger("Tell_secret");
+        dying_ani.SetTrigger("chat_qt");
         Passwords = true;
         keyGot = true;
         return true;

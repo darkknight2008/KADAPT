@@ -267,7 +267,6 @@ public class MyBehaviorTree_full : MonoBehaviour
                         new DecoratorLoop
                         (
                             this.Randomwalk(Zombie1, this.wander1, 3.0f, 1000)
-                            //this.wander(Zombie1,wander1,wander2)
                         ),
                         this.canBite(Zombie1, Hero)
                     )
