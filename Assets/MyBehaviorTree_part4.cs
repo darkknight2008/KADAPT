@@ -5,7 +5,7 @@ using TreeSharpPlus;
 using UnityEngine.UI;
 
 public class MyBehaviorTree_part4 : MonoBehaviour {
-    public GameObject villager1, villager2, villager3, villager4, villager5, villager6, info1, mayer, companian, Hero;
+    public GameObject villager1, villager2, villager3, villager4, villager5, villager6, info1, mayor, companian, Hero;
     public Transform v1, v2, v3, v4, v5, v6, v7, v8, v10;
 
     public Text thanks_hero;
@@ -53,6 +53,18 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
         }
     }
 
+    public bool back2steer()
+    {
+        villager1.GetComponent<UnitySteeringController>().enabled = true;
+        villager2.GetComponent<UnitySteeringController>().enabled = true;
+        villager3.GetComponent<UnitySteeringController>().enabled = true;
+        villager4.GetComponent<UnitySteeringController>().enabled = true;
+        villager5.GetComponent<UnitySteeringController>().enabled = true;
+        villager6.GetComponent<UnitySteeringController>().enabled = true;
+        info1.GetComponent<UnitySteeringController>().enabled = true;
+        mayor.GetComponent<UnitySteeringController>().enabled = true;
+        return true;
+    }
     protected Node BuildTreeRoot()
     {
         Node root = new Sequence
@@ -60,6 +72,8 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                 this.moveTo(companian, v1, 100),
                 new Sequence
                 (
+                    new LeafAssert(() => this.back2steer()),
+                    new LeafWait(1000),
                     new SelectorParallel
                     (
                         this.moveTo(villager1, v2, 22000),
@@ -69,8 +83,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                         this.moveTo(villager5, v6, 22000),
                         this.moveTo(villager6, v7, 22000),
                         this.moveTo(info1, v8, 22000),
-                        //this.moveTo(info2, v9, 22000),
-                        this.moveTo(mayer, v10, 22000)
+                        this.moveTo(mayor, v10, 22000)
                     ),
 
                     new SelectorParallel
@@ -82,9 +95,8 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                         this.Clap(villager5),
                         this.Clap(villager6),
                         this.Clap(info1),
-                        //this.Clap(info2),
                         this.Clap(companian),
-                        this.Clap(mayer)
+                        this.Clap(mayor)
                     ),
                     new LeafWait(2000),
                     this.Hero_soso(Hero),
@@ -143,7 +155,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
 
     public void PositionTrans(GameObject gb, Text assignText)
     {
-        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z);
+        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z) + new Vector3(0, 1.5f, 0);
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         assignText.transform.position = position;
