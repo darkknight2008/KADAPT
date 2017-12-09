@@ -34,11 +34,14 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     public bool Passwords = false;
     public bool Failure = false;
     public bool Success = false;
+    public bool sword_bool = false;
+    public bool sword_disappear = false;
 
     //Text
     //public Text winText;
     public Text failtext;
     public Text dyingText;
+    public Text sword_text;
     public Camera cam;
     private DoorHoldOn D;
 
@@ -63,6 +66,7 @@ public class MyBehaviorTree_part2 : MonoBehaviour
         //text
         failtext.text = "";
         dyingText.text = "";
+        sword_text.text = "";
         D = door.GetComponent<DoorHoldOn>();
         Hero.GetComponent<PlayerController2>().enabled = true;
     }
@@ -100,10 +104,28 @@ public class MyBehaviorTree_part2 : MonoBehaviour
             PositionTransDead(dyingText);
             dyingText.text = "";
         }
-	if (keyGot==true)
+        if (sword_bool == true)
+        {
+            PositionTrans(Hero, sword_text);
+            sword_text.text = "Congratulations, you get a SWORD! Make good use of it!";
+        }
+        if (sword_disappear == true)
+        {
+            sword_text.text = "";
+        }
+
+        if (keyGot==true)
         {
             D.key_get = true;
         }
+    }
+
+    public void PositionTrans(GameObject gb, Text assignText)
+    {
+        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z) + new Vector3(0, 1.5f, 0);
+        Vector2 position = cam.WorldToScreenPoint(worldPosition);
+        position = new Vector2(position.x, position.y);
+        assignText.transform.position = position;
     }
 
     public class canGotBite : Node
@@ -189,7 +211,9 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     {
         return new Sequence(
             new canGetSword(Hero, sword),
-            new LeafAssert(() => pickSword(Hero, sword)));
+            new LeafAssert(() => pickSword(Hero, sword)),
+            new LeafWait(1000),
+            new LeafAssert(() => sword_text_disappear(sword_text)));
     }
 
     public bool pickSword(GameObject Hero, GameObject sword)
@@ -198,12 +222,18 @@ public class MyBehaviorTree_part2 : MonoBehaviour
 
         script.isHold = true;
         script.holdBy = Hero;
+        sword_bool = true;
 
         sword.transform.position = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/Sword").transform.position;
         sword.transform.rotation = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/Sword").transform.rotation;
 
         sword.transform.parent = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand").transform;
 
+        return true;
+    }
+    public bool sword_text_disappear(Text sword_text)
+    {
+        sword_disappear = true;
         return true;
     }
 
