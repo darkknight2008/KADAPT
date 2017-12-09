@@ -5,7 +5,7 @@ using TreeSharpPlus;
 using UnityEngine.UI;
 
 public class MyBehaviorTree_part4 : MonoBehaviour {
-    public GameObject villager1, villager2, villager3, villager4, villager5, villager6, info1, mayor, companian, Hero;
+    public GameObject Villager1, Villager2, Villager3, Villager4, Villager5, Villager6, info1, Mayor, companian, Hero;
     public Transform v1, v2, v3, v4, v5, v6, v7, v8, v10;
 
     public Text thanks_hero;
@@ -35,7 +35,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
     {
         if (thanks == true)
         {
-            PositionTrans(villager1, thanks_hero);
+            PositionTrans(Villager1, thanks_hero);
             thanks_hero.text = "HERO, thanks for helping Eric! We will remember your kindness and bravery forever.";
         }
         if (thanks_disappear == true)
@@ -55,14 +55,14 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
 
     public bool back2steer()
     {
-        villager1.GetComponent<UnitySteeringController>().enabled = true;
-        villager2.GetComponent<UnitySteeringController>().enabled = true;
-        villager3.GetComponent<UnitySteeringController>().enabled = true;
-        villager4.GetComponent<UnitySteeringController>().enabled = true;
-        villager5.GetComponent<UnitySteeringController>().enabled = true;
-        villager6.GetComponent<UnitySteeringController>().enabled = true;
+        Villager1.GetComponent<UnitySteeringController>().enabled = true;
+        Villager2.GetComponent<UnitySteeringController>().enabled = true;
+        Villager3.GetComponent<UnitySteeringController>().enabled = true;
+        Villager4.GetComponent<UnitySteeringController>().enabled = true;
+        Villager5.GetComponent<UnitySteeringController>().enabled = true;
+        Villager6.GetComponent<UnitySteeringController>().enabled = true;
         info1.GetComponent<UnitySteeringController>().enabled = true;
-        mayor.GetComponent<UnitySteeringController>().enabled = true;
+        Mayor.GetComponent<UnitySteeringController>().enabled = true;
         return true;
     }
     protected Node BuildTreeRoot()
@@ -76,27 +76,27 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                     new LeafWait(1000),
                     new SelectorParallel
                     (
-                        this.moveTo(villager1, v2, 22000),
-                        this.moveTo(villager2, v3, 22000),
-                        this.moveTo(villager3, v4, 22000),
-                        this.moveTo(villager4, v5, 22000),
-                        this.moveTo(villager5, v6, 22000),
-                        this.moveTo(villager6, v7, 22000),
+                        this.moveTo(Villager1, v2, 22000),
+                        this.moveTo(Villager2, v3, 22000),
+                        this.moveTo(Villager3, v4, 22000),
+                        this.moveTo(Villager4, v5, 22000),
+                        this.moveTo(Villager5, v6, 22000),
+                        this.moveTo(Villager6, v7, 22000),
                         this.moveTo(info1, v8, 22000),
-                        this.moveTo(mayor, v10, 22000)
+                        this.moveTo(Mayor, v10, 22000)
                     ),
 
                     new SelectorParallel
                     (
-                        this.Clap(villager1),
-                        this.Clap(villager2),
-                        this.Clap(villager3),
-                        this.Clap(villager4),
-                        this.Clap(villager5),
-                        this.Clap(villager6),
+                        this.Clap(Villager1),
+                        this.Clap(Villager2),
+                        this.Clap(Villager3),
+                        this.Clap(Villager4),
+                        this.Clap(Villager5),
+                        this.Clap(Villager6),
                         this.Clap(info1),
                         this.Clap(companian),
-                        this.Clap(mayor)
+                        this.Clap(Mayor)
                     ),
                     new LeafWait(2000),
                     this.Hero_soso(Hero),
@@ -106,13 +106,13 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
         return root;
     }
 
-    protected Node Clap(GameObject villager1)
+    protected Node Clap(GameObject Villager1)
     {
-        Animator villager_ani = villager1.GetComponent<Animator>();
-        return new Sequence(new LeafAssert(() => this.clap_villager(villager_ani)), new LeafWait(7000), new LeafAssert(() => this.StopClap(villager_ani)));
+        Animator Villager_ani = Villager1.GetComponent<Animator>();
+        return new Sequence(new LeafAssert(() => this.clap_Villager(Villager_ani)), new LeafWait(7000), new LeafAssert(() => this.StopClap(Villager_ani)));
     }
 
-    public bool clap_villager(Animator chr)
+    public bool clap_Villager(Animator chr)
     {
         chr.SetTrigger("clap");
         thanks = true;

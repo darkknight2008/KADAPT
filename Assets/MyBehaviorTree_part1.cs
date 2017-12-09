@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class MyBehaviorTree_part1 : MonoBehaviour
 {
 	public GameObject Hero;
-    public GameObject Chief;
+    public GameObject Mayor;
     public GameObject Oldman;
 	public GameObject Villager1;
     public GameObject Villager2;
@@ -21,8 +21,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
 
     private BehaviorAgent behaviorAgent;
 
-    private Vector3 reach_oldman;
-    private Vector3 reach_chief;
 
     //text control
     private bool direction=false;
@@ -45,18 +43,14 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         behaviorAgent.StartBehavior();
         direction_text.text = "";
         task_text.text = "";
+
+        Hero.GetComponent<PlayerController2>().enabled = true;
+        Hero.GetComponent<CharacterController>().enabled = false;
     }
 
     // Update is called once per frame
     void Update ()
 	{
-        Vector3 hero_posi = Hero.GetComponent<Transform>().position;
-        Vector3 oldman_posi = Oldman.GetComponent<Transform>().position;
-        Vector3 chief_posi = Chief.GetComponent<Transform>().position;
-        reach_oldman = 0.20f * oldman_posi + 0.80f * hero_posi;
-        reach_chief = 0.20f * chief_posi + 0.80f * hero_posi;
-
-
         //text control
         if (direction == true)
         {
@@ -69,7 +63,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         }
         if (task == true)
         {
-            PositionTrans(Chief, task_text);
+            PositionTrans(Mayor, task_text);
             task_text.text = "Hi HERO, thanks for your coming. Our brave villager ERIC tried to rescue ALICE but we have lost him contact for several days. ALICE is all I have and please get her back.";
         }
         if (task_disappear == true)
@@ -101,8 +95,7 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             {
                 if (Vector3.Distance(Hero.transform.position, Oldman.transform.position) < 6)
                 {
-                    Hero.GetComponent<PlayerController2>().enabled = false;
-                    //Hero.GetComponent<CharacterController>().enabled = true;
+                    
                     yield return RunStatus.Success;
                     yield break;
                 }
@@ -127,6 +120,21 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             Animator hero = Hero.GetComponent<Animator>();
             hero.SetTrigger("H_Wave");//waving
             //text?
+            yield return RunStatus.Success;
+
+        }
+    }
+    public class stayHere : Node
+    {
+        protected GameObject Chrc;
+        public stayHere(GameObject Chrc)
+        {
+            this.Chrc = Chrc;
+        }
+        public override IEnumerable<RunStatus> Execute()
+        {
+             Chrc.GetComponent<PlayerController2>().enabled = false;
+             Chrc.GetComponent<CharacterController>().enabled = true;
             yield return RunStatus.Success;
 
         }
@@ -156,16 +164,32 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         public override IEnumerable<RunStatus> Execute()
         {
             Chrc.GetComponent<PlayerController2>().enabled = true;
+            Chrc.GetComponent<CharacterController>().enabled = false;
             yield return RunStatus.Success;
 
         }
     }
-    protected Node askdire(GameObject Hero, GameObject Oldman, Vector3 reach_oldman)
+
+    public Node lookAtEachOther(GameObject G1, GameObject G2)
     {
-        Val<Vector3> reach = Val.V(() => reach_oldman);
+        Val<Vector3> p1 = Val.V(() => G1.transform.position);
+        Val<Vector3> p2 = Val.V(() => G2.transform.position);
+        return new SequenceParallel(
+                    G1.GetComponent<BehaviorMecanim>().Node_OrientTowards(p2),
+                    G2.GetComponent<BehaviorMecanim>().Node_OrientTowards(p1)
+                    );
+    }
+    protected Node askdire(GameObject Hero, GameObject Oldman)
+    {
+        //Val<Vector3> reach = Val.V(() => (Oldman.transform.position-Hero.transform.position)/ Vector3.Distance(Hero.transform.position, Oldman.transform.position));
+        Val<Vector3> reach = Val.V(()=> Oldman.transform.position);
+        Val<float> dist = Val.V(() => 2.5f);
         return new Sequence(
-            //Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach), 
-            //new LeafWait(100),
+            new stayHere(Hero),
+            new LeafWait(1000),
+            Hero.GetComponent<BehaviorMecanim>().Node_GoToUpToRadius(reach,dist),
+            lookAtEachOther(Hero,Oldman),
+            new LeafWait(100),
             new waving(Hero),
             new LeafWait(1000),
             new back2idle(Hero),
@@ -241,7 +265,6 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             {
                 if (Vector3.Distance(Hero.transform.position, Chief.transform.position) < 6)
                 {
-                    Hero.GetComponent<PlayerController2>().enabled = false;
                     yield return RunStatus.Success;
                     yield break;
                 }
@@ -250,9 +273,9 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             }
         }
     }
-    protected Node canmeet(GameObject Hero,GameObject Chief)
+    protected Node canmeet(GameObject Hero,GameObject Mayor)
     {
-        return new canmeetChief(Hero, Chief);
+        return new canmeetChief(Hero, Mayor);
     }
     public class bowing : Node
     {
@@ -264,18 +287,23 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         public override IEnumerable<RunStatus> Execute()
         {
             Animator hero = Hero.GetComponent<Animator>();
-            hero.SetTrigger("bow");//bowing
+            hero.SetTrigger("Kneel");//Kneel down
             //text?
             yield return RunStatus.Success;
         }
     }
-    protected Node intro2self(GameObject Hero,Val<Vector3> reach_chief)
+    protected Node intro2self(GameObject Hero,GameObject Mayor)
     {
+        Val<Vector3> reach = Val.V(() => Mayor.transform.position);
+        Val<float> dist = Val.V(() => 2.5f);
         return new Sequence(
-           // Hero.GetComponent<BehaviorMecanim>().Node_GoTo(reach_chief),
-           // new LeafWait(100),
+            new stayHere(Hero),
+            new LeafWait(1000),
+            Hero.GetComponent<BehaviorMecanim>().Node_GoToUpToRadius(reach, dist),
+            lookAtEachOther(Hero,Mayor),
+            new LeafWait(100),
             new bowing(Hero),
-            //new LeafWait(500),
+            new LeafWait(500),
             new back2idle(Hero),
             new LeafWait(3000),
             new back2live(Hero)
@@ -283,28 +311,28 @@ public class MyBehaviorTree_part1 : MonoBehaviour
     }
     public class requesting_down : Node
     {
-        protected GameObject Chief;
-        public requesting_down(GameObject Chief,bool text)
+        protected GameObject Mayor;
+        public requesting_down(GameObject Mayor,bool text)
         {
-            this.Chief = Chief;
+            this.Mayor = Mayor;
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            Animator chief = Chief.GetComponent<Animator>();
+            Animator chief = Mayor.GetComponent<Animator>();
             chief.SetTrigger("Request_down");//empty now
             yield return RunStatus.Success;
         }
     }
     public class requesting_up : Node
     {
-        protected GameObject Chief;
-        public requesting_up(GameObject Chief)
+        protected GameObject Mayor;
+        public requesting_up(GameObject Mayor)
         {
-            this.Chief = Chief;
+            this.Mayor = Mayor;
         }
         public override IEnumerable<RunStatus> Execute()
         {
-            Animator chief = Chief.GetComponent<Animator>();
+            Animator chief = Mayor.GetComponent<Animator>();
             chief.SetTrigger("Request_up");
             yield return RunStatus.Success;
         }
@@ -319,15 +347,16 @@ public class MyBehaviorTree_part1 : MonoBehaviour
         task_disappear = true;
         return true;
     }
-    protected Node request(GameObject Chief)
+    protected Node request(GameObject Mayor)
     {
         return new Sequence(
-            new requesting_down(Chief, task),
+            new requesting_down(Mayor, task),
             new LeafAssert(() => this.showtask()),
             new LeafWait(4000),
-            new requesting_up(Chief),
+            new requesting_up(Mayor),
             new LeafWait(6000),
-            new LeafAssert(()=> this.closetask())
+            new LeafAssert(()=> this.closetask()),
+            new back2idle(Mayor)
             );
     }
     public class bargaining : Node
@@ -449,15 +478,15 @@ public class MyBehaviorTree_part1 : MonoBehaviour
             new SuccessLoop(
                 this.canask(Hero, Oldman)
                 ),
-            this.askdire(Hero,Oldman, reach_oldman),
+            this.askdire(Hero,Oldman),
             this.pointdire(Oldman)
             );
         Node Chiefstask = new Sequence(
             new SuccessLoop(
-                this.canmeet(Hero, Chief)
+                this.canmeet(Hero, Mayor)
                 ),
-            this.intro2self(Hero, reach_chief),
-            this.request(Chief)
+            this.intro2self(Hero,Mayor),
+            this.request(Mayor)
             );
         Node Shop = new DecoratorLoop(
             this.bargain(Villager1,Villager2)
