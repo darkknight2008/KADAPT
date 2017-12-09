@@ -187,8 +187,26 @@ public class MyBehaviorTree_part2 : MonoBehaviour
     }
     protected Node getSword(GameObject Hero, GameObject sword)
     {
-        return new canGetSword(Hero, sword);
+        return new Sequence(
+            new canGetSword(Hero, sword),
+            new LeafAssert(() => pickSword(Hero, sword)));
     }
+
+    public bool pickSword(GameObject Hero, GameObject sword)
+    {
+        SwordController script = sword.GetComponent<SwordController>();
+
+        script.isHold = true;
+        script.holdBy = Hero;
+
+        sword.transform.position = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/Sword").transform.position;
+        sword.transform.rotation = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/Sword").transform.rotation;
+
+        sword.transform.parent = script.holdBy.transform.Find("Hero/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand").transform;
+
+        return true;
+    }
+
     public class canDoorOpen : Node
     {
         protected GameObject Hero;
