@@ -49,7 +49,7 @@ public class PlayerController2 : MonoBehaviour
             anim.SetFloat("Speed", velocity);
             //anim.SetFloat("Direction", Mathf.Sign(angleVelocity));
             anim.SetFloat("AngularSpeed", 0.5f * angleVelocity);
-            //anim.SetFloat("Direction", velocity);
+            anim.SetFloat("Direction", 0.0f);
         }
     }
 }

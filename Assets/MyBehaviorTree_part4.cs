@@ -5,7 +5,7 @@ using TreeSharpPlus;
 using UnityEngine.UI;
 
 public class MyBehaviorTree_part4 : MonoBehaviour {
-    public GameObject Villager1, Villager2, Villager3, Villager4, Villager5, Villager6, info1, Mayor, companian, Hero;
+    public GameObject Villager1, Villager2, Villager3, Villager4, Villager5, Villager6, Oldman, Mayor, Princess, Hero;
     public Transform v1, v2, v3, v4, v5, v6, v7, v8, v10;
 
     public Text thanks_hero;
@@ -61,7 +61,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
         Villager4.GetComponent<UnitySteeringController>().enabled = true;
         Villager5.GetComponent<UnitySteeringController>().enabled = true;
         Villager6.GetComponent<UnitySteeringController>().enabled = true;
-        info1.GetComponent<UnitySteeringController>().enabled = true;
+        Oldman.GetComponent<UnitySteeringController>().enabled = true;
         Mayor.GetComponent<UnitySteeringController>().enabled = true;
         return true;
     }
@@ -69,7 +69,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
     {
         Node root = new Sequence
             (
-                this.moveTo(companian, v1, 100),
+                this.moveTo(Princess, v1, 100),
                 new Sequence
                 (
                     new LeafAssert(() => this.back2steer()),
@@ -82,7 +82,7 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                         this.moveTo(Villager4, v5, 22000),
                         this.moveTo(Villager5, v6, 22000),
                         this.moveTo(Villager6, v7, 22000),
-                        this.moveTo(info1, v8, 22000),
+                        this.moveTo(Oldman, v8, 22000),
                         this.moveTo(Mayor, v10, 22000)
                     ),
 
@@ -94,8 +94,8 @@ public class MyBehaviorTree_part4 : MonoBehaviour {
                         this.Clap(Villager4),
                         this.Clap(Villager5),
                         this.Clap(Villager6),
-                        this.Clap(info1),
-                        this.Clap(companian),
+                        this.Clap(Oldman),
+                        this.Clap(Princess),
                         this.Clap(Mayor)
                     ),
                     new LeafWait(2000),
