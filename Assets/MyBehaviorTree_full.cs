@@ -62,6 +62,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool Success = false;
     public bool sword_bool = false;
     public bool sword_disappear = false;
+    public bool save_prin = false;
 
     //Text
     //public Text winText;
@@ -1404,14 +1405,27 @@ public class MyBehaviorTree_full : MonoBehaviour
     protected Node talking(GameObject Villager5, GameObject Villager6)
     {
         return new SequenceParallel(
-           new bargaining(Villager5),
+            new Sequence(
+                new LeafAssert(() => this.save_prin_app()),
+                new bargaining(Villager5)),
             new Sequence(
                 new LeafWait(3000),
                 new bargaining(Villager6),
                 new back2idle(Villager5),
-                new back2idle(Villager6)),
-            new LeafWait(7000)
+                new back2idle(Villager6),
+                new LeafAssert(() => this.save_prin_disapp())),
+            new LeafWait(7200)
             );
+    }
+    public bool save_prin_app()
+    {
+        save_prin = true;
+        return true;
+    }
+    public bool save_prin_disapp()
+    {
+        save_prin = false;
+        return true;
     }
     protected Node Part3Node()
     {
