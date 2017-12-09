@@ -1345,7 +1345,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) < 1f)
+                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) <2f &&  Vector3.Angle(Hero.transform.position- zombie.transform.position, zombie.transform.forward)<90.0f)
                 {
                     yield return RunStatus.Success;
                     yield break;
