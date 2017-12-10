@@ -62,12 +62,15 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool Success = false;
     public bool sword_bool = false;
     public bool sword_disappear = false;
+    public bool save_prin = false;
+    public bool save_prin_dis = false;
 
     //Text
     //public Text winText;
     public Text failtext;
     public Text dyingText;
     public Text sword_text;
+    public Text prin_thank;
     private DoorHoldOn D;
 
     private Vector3 reach_posi;
@@ -113,9 +116,6 @@ public class MyBehaviorTree_full : MonoBehaviour
     public bool thanks_disappear = false;
     public bool end = false;
     public bool end_disappear = false;
-
-    //preprocessing points
-    public Transform ini1, ini2, ini3, ini4,ini5;
     // Use this for initialization
     void Start()
     {
@@ -124,6 +124,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         behaviorAgent.StartBehavior();
         direction_text.text = "";
         task_text.text = "";
+        prin_thank.text = "";
 
         Hero.GetComponent<PlayerController2>().enabled = true;
 
@@ -192,7 +193,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         if (Passwords == true)
         {
             PositionTransDead(dyingText);
-            dyingText.text = "I got hurt so badly that can't go with you, go and get the sword!!! ALICE's life is counting on you.";
+            dyingText.text = "I can't go with you, go and get the sword!!! ALICE's life is counting on you.";
         }
         else
         {
@@ -212,6 +213,15 @@ public class MyBehaviorTree_full : MonoBehaviour
         if (keyGot == true)
         {
             D.key_get = true;
+        }
+        if (save_prin == true)
+        {
+            PositionTrans(Princess, prin_thank);
+            prin_thank.text = "HERO,thanks.You are the sunshine in my life.";
+        }
+        if (save_prin_dis == true)
+        {
+            prin_thank.text = "";
         }
 
         //part 4
@@ -239,30 +249,18 @@ public class MyBehaviorTree_full : MonoBehaviour
     protected Node BuildTreeRoot()
     {
         return new Sequence(
-            preprocess(Oldman,Mayor,Dying,Princess,guard),
             new SequenceParallel(
             Part1Node(),
             Part2Node(),
-            Part3Node()
-            ),
+            Part3Node()),
             Part4Node(),
             new LeafWait(100)
-            );
-    }
-    protected Node preprocess(GameObject Chr1,GameObject Chr2,GameObject Chr3,GameObject Chr4,GameObject Chr5)
-    {
-        return new SequenceParallel(
-            Chr1.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => ini1.position)),
-            Chr2.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => ini2.position)),
-            Chr3.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => ini3.position)),
-            Chr4.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => ini4.position)),
-            Chr5.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => ini5.position))
             );
     }
     //part 1
     public void PositionTrans(GameObject gb, Text assignText)
     {
-        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z) + new Vector3(0, 1.5f, 0);
+        Vector3 worldPosition = new Vector3(gb.transform.position.x, gb.transform.position.y, gb.transform.position.z) + new Vector3(0, 2f, 0);
         Vector2 position = cam.WorldToScreenPoint(worldPosition);
         position = new Vector2(position.x, position.y);
         assignText.transform.position = position;
@@ -737,6 +735,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         return new canGotBite(zombie, Hero);
     }
+
     public class canTheyTalk : Node
     {
         protected GameObject Hero;
@@ -844,6 +843,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         return new canDoorOpen(Hero, door, keyGot);
     }
+
     public class nowGetKey : Node
     {
         protected bool keyGot;
@@ -861,6 +861,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         return new nowGetKey(keyGot);
     }
+
     public class nowSwitchDoor : Node
     {
         protected GameObject door;
@@ -878,6 +879,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     {
         return new nowSwitchDoor(door);
     }
+
     public bool HE()
     {
         Success = true;
@@ -893,6 +895,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         }
         return true;
     }
+
     //Zombie bites
     protected Node ZombieBite(GameObject Zombie, GameObject Hero)
     {
@@ -1014,12 +1017,7 @@ public class MyBehaviorTree_full : MonoBehaviour
     //Tell key
     protected Node TellKey(GameObject Hero, GameObject Dying)
     {
-        Val<Vector3> reach = Val.V(() => Dying.transform.position);
-        Val<float> dist = Val.V(() => 2.5f);
         return new Sequence(
-            Hero.GetComponent<BehaviorMecanim>().Node_GoToUpToRadius(reach, dist),
-            lookAtEachOther(Hero, Dying),
-            new LeafWait(500),
             this.Salute(Hero, Dying),
             this.Tell(Hero, Dying));
     }
@@ -1360,7 +1358,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         {
             while (true)
             {
-                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) <2f &&  Vector3.Angle(Hero.transform.position- zombie.transform.position, zombie.transform.forward)<90.0f)
+                if (Vector3.Distance(Hero.transform.position, zombie.transform.position) <1f &&  Vector3.Angle(Hero.transform.position- zombie.transform.position, zombie.transform.forward)<90.0f)
                 {
                     yield return RunStatus.Success;
                     yield break;
@@ -1419,14 +1417,27 @@ public class MyBehaviorTree_full : MonoBehaviour
     protected Node talking(GameObject Villager5, GameObject Villager6)
     {
         return new SequenceParallel(
-           new bargaining(Villager5),
+            new Sequence(
+                new LeafAssert(() => this.save_prin_app()),
+                new bargaining(Villager5)),
             new Sequence(
                 new LeafWait(3000),
                 new bargaining(Villager6),
                 new back2idle(Villager5),
-                new back2idle(Villager6)),
-            new LeafWait(7000)
+                new back2idle(Villager6),
+                new LeafAssert(() => this.save_prin_disapp())),
+            new LeafWait(7200)
             );
+    }
+    public bool save_prin_app()
+    {
+        save_prin = true;
+        return true;
+    }
+    public bool save_prin_disapp()
+    {
+        save_prin_dis = true;
+        return true;
     }
     protected Node Part3Node()
     {
@@ -1442,6 +1453,7 @@ public class MyBehaviorTree_full : MonoBehaviour
         (
             this.canTalk(Hero, Princess)
         ),
+        this.lookAtEachOther(Princess,Hero),
         this.talking(Princess, Hero),
         new SelectorParallel
         (
@@ -1557,17 +1569,7 @@ public class MyBehaviorTree_full : MonoBehaviour
                         this.moveTo(Oldman, v8, 100),
                         this.moveTo(Mayor, v10, 100)
                     ),
-                    new SequenceParallel(
-                        Villager1.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(()=>Hero.transform.position)),
-                        Villager2.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Villager3.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Villager4.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Villager5.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Villager6.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Princess.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Mayor.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position)),
-                        Oldman.GetComponent<BehaviorMecanim>().Node_OrientTowards(Val.V(() => Hero.transform.position))
-                        ),
+
                     new SelectorParallel
                     (
                         this.Clap(Villager1),
